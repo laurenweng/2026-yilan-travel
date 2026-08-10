@@ -1,0 +1,271 @@
+"use client";
+
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from "react";
+import {
+  getBackpackPreviewState,
+  type BackpackDisplayItem,
+  type BackpackDisplayState,
+} from "../../lib/backpack-state";
+import {
+  readSeenRewardItemIds,
+  writeSeenRewardItemIds,
+} from "../../lib/backpack-progress";
+import {
+  closeBackpackItem,
+  createBackpackSession,
+  openBackpackItem,
+  resolveSessionBackpackDisplay,
+} from "../../lib/backpack-session";
+import { getPreviewTime } from "../../lib/preview-time";
+import {
+  getInitialItineraryDate,
+  type ItineraryDate,
+} from "../../lib/itinerary-date";
+import { loadTripEventsWithFallback } from "../../lib/trip-csv";
+import { resolveTripSnapshot } from "../../lib/trip-time";
+import type { TripDataWarning, TripEvent } from "../../lib/trip-types";
+import { BackpackItemSheet } from "./backpack-item-sheet";
+import { BackpackView } from "./backpack-view";
+import { BottomNavigation, type NavigationTab } from "./bottom-navigation";
+import { CarAssignmentSheet } from "./car-assignment-sheet";
+import { EventInfoSheet } from "./event-info-sheet";
+import { HomeView } from "./home-view";
+import { ItineraryView } from "./itinerary-view";
+
+type LoadState = "loading" | "ready" | "error";
+
+const primaryTripDataSourceUrl =
+  process.env.NEXT_PUBLIC_TRIP_CSV_URL || "/api/trip-data";
+const fallbackTripDataSourceUrl = "/data/trip-demo.csv";
+
+const readPreviewMode = () => {
+  if (typeof window === "undefined") return null;
+  if (process.env.NODE_ENV !== "development") return null;
+
+  return new URLSearchParams(window.location.search).get("preview");
+};
+
+const isBackpackVisualPreviewMode = (previewMode: string | null) =>
+  previewMode?.startsWith("backpack-") ?? false;
+
+const readDevelopmentBackpackPreviewState = () => {
+  if (typeof window === "undefined") return "locked" as const;
+
+  const previewMode = new URLSearchParams(window.location.search).get("preview");
+  return getBackpackPreviewState(
+    previewMode,
+    process.env.NODE_ENV === "development",
+  );
+};
+
+const subscribeToBackpackPreview = () => () => {};
+
+const readServerBackpackPreviewState = (): BackpackDisplayState => "locked";
+
+export const TripHandbook = () => {
+  const [activeTab, setActiveTab] = useState<NavigationTab>("home");
+  const [events, setEvents] = useState<TripEvent[]>([]);
+  const [loadState, setLoadState] = useState<LoadState>("loading");
+  const [warnings, setWarnings] = useState<TripDataWarning[]>([]);
+  const [previewMode] = useState(readPreviewMode);
+  const [initialTripTime] = useState(() => new Date());
+  const backpackState = useSyncExternalStore(
+    subscribeToBackpackPreview,
+    readDevelopmentBackpackPreviewState,
+    readServerBackpackPreviewState,
+  );
+  const [backpackSession, setBackpackSession] = useState(() =>
+    createBackpackSession(readSeenRewardItemIds()),
+  );
+  const [currentTime, setCurrentTime] = useState(initialTripTime);
+  const [selectedItineraryDate, setSelectedItineraryDate] =
+    useState<ItineraryDate>(() => getInitialItineraryDate(initialTripTime));
+  const [selectedEvent, setSelectedEvent] = useState<TripEvent | null>(null);
+  const [sheetTrigger, setSheetTrigger] = useState<HTMLElement | null>(null);
+
+  const refreshTripData = useCallback(async () => {
+    setLoadState("loading");
+
+    try {
+      const result = await loadTripEventsWithFallback(
+        primaryTripDataSourceUrl,
+        fallbackTripDataSourceUrl,
+      );
+      setEvents(result.events);
+      setWarnings(result.warnings);
+      setLoadState("ready");
+    } catch {
+      setLoadState("error");
+    }
+  }, []);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const loadInitialTripData = async () => {
+      try {
+        const result = await loadTripEventsWithFallback(
+          primaryTripDataSourceUrl,
+          fallbackTripDataSourceUrl,
+        );
+        if (isCancelled) return;
+
+        setEvents(result.events);
+        setWarnings(result.warnings);
+        setLoadState("ready");
+      } catch {
+        if (!isCancelled) setLoadState("error");
+      }
+    };
+
+    void loadInitialTripData();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (previewMode) return;
+
+    const timerId = window.setInterval(() => setCurrentTime(new Date()), 60_000);
+    return () => window.clearInterval(timerId);
+  }, [previewMode]);
+
+  const previewTripTime = useMemo(() => {
+    if (!previewMode || events.length === 0) return null;
+
+    return getPreviewTime(
+      previewMode,
+      process.env.NODE_ENV === "development",
+      events,
+    );
+  }, [previewMode, events]);
+  const effectiveTime = previewTripTime ?? currentTime;
+
+  const snapshot = useMemo(
+    () => (events.length > 0 ? resolveTripSnapshot(events, effectiveTime) : null),
+    [effectiveTime, events],
+  );
+
+  const isBackpackVisualPreview = isBackpackVisualPreviewMode(previewMode);
+  const isTripTimePreview = previewTripTime !== null;
+  const backpackDisplay = useMemo(
+    () =>
+      resolveSessionBackpackDisplay({
+        backpackState,
+        effectiveTime,
+        events,
+        isBackpackVisualPreview,
+        isTripTimePreview,
+        session: backpackSession,
+      }),
+    [
+      backpackState,
+      effectiveTime,
+      events,
+      isBackpackVisualPreview,
+      isTripTimePreview,
+      backpackSession,
+    ],
+  );
+  const handleOpenEvent = useCallback(
+    (event: TripEvent, triggerElement: HTMLElement) => {
+      if (!event.action) return;
+      setSheetTrigger(triggerElement);
+      setSelectedEvent(event);
+    },
+    [],
+  );
+
+  const handleOpenBackpackItem = useCallback(
+    (item: BackpackDisplayItem, triggerElement: HTMLElement) => {
+      setSheetTrigger(triggerElement);
+
+      // 先算出新 session 再決定是否寫入；setState 的 updater 必須保持純函式。
+      const { session, shouldPersist } = openBackpackItem(
+        backpackSession,
+        item,
+        { isTripTimePreview },
+      );
+
+      setBackpackSession(session);
+      if (shouldPersist) writeSeenRewardItemIds(session.seenItemIds);
+    },
+    [backpackSession, isTripTimePreview],
+  );
+
+  const handleCloseBackpackItemSheet = useCallback(
+    () => setBackpackSession(closeBackpackItem),
+    [],
+  );
+
+  const handleCloseSheet = useCallback(() => setSelectedEvent(null), []);
+
+  return (
+    <main className="trip-app-shell">
+      <div className="trip-app-content">
+        {activeTab === "home" && (
+          <HomeView
+            events={events}
+            loadState={loadState}
+            onRefresh={refreshTripData}
+            snapshot={snapshot}
+            warningCount={warnings.length}
+          />
+        )}
+        {activeTab === "itinerary" && (
+          <ItineraryView
+            events={events}
+            onDateChange={setSelectedItineraryDate}
+            onOpenEvent={handleOpenEvent}
+            selectedDate={selectedItineraryDate}
+          />
+        )}
+        {activeTab === "backpack" && (
+          <BackpackView
+            display={backpackDisplay}
+            onOpenItem={handleOpenBackpackItem}
+          />
+        )}
+      </div>
+
+      <BottomNavigation
+        activeTab={activeTab}
+        hasNewBackpackItem={backpackDisplay.hasNotification}
+        onChange={setActiveTab}
+      />
+
+      {selectedEvent?.action && (
+        selectedEvent.action.type === "vehicle" ? (
+          <CarAssignmentSheet
+            event={selectedEvent}
+            onClose={handleCloseSheet}
+            returnFocusTo={sheetTrigger}
+          />
+        ) : (
+          <EventInfoSheet
+            actionType={selectedEvent.action.type}
+            event={selectedEvent}
+            onClose={handleCloseSheet}
+            returnFocusTo={sheetTrigger}
+          />
+        )
+      )}
+
+      {backpackSession.selectedItem && (
+        <BackpackItemSheet
+          item={backpackSession.selectedItem}
+          onClose={handleCloseBackpackItemSheet}
+          returnFocusTo={sheetTrigger}
+        />
+      )}
+    </main>
+  );
+};

@@ -1,0 +1,1771 @@
+@import "tailwindcss";
+
+@font-face {
+  font-display: swap;
+  font-family: "GenSen Rounded";
+  font-style: normal;
+  font-weight: 400;
+  src: url("https://cdn.jsdelivr.net/gh/ButTaiwan/gensen-font@master/otf/TW/GenSenRounded2TW-R.otf") format("opentype");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "GenSen Rounded";
+  font-style: normal;
+  font-weight: 700;
+  src: url("https://cdn.jsdelivr.net/gh/ButTaiwan/gensen-font@master/otf/TW/GenSenRounded2TW-B.otf") format("opentype");
+}
+
+:root {
+  --color-page: #fff5d4;
+  --color-brand: #80bb82;
+  --color-brand-dark: #4f9257;
+  --color-ink: #68524e;
+  --color-locked-slot: #566b5c;
+  --color-notification: #f42a5a;
+  --color-accent: #ee7c69;
+  --color-sun: #f5db76;
+  --color-panel: #fffaf0;
+  --color-line: #d3bfaa;
+  --color-overlay: rgb(38 35 30 / 52%);
+  --color-energy-mid: #e89900;
+  --color-energy-low: #fc3c3c;
+  --color-energy-shadow: #b3b3b3;
+  --content-width: 393px;
+  --bottom-navigation-height: 64px;
+  --font-rounded: "GenSen Rounded", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  /* 淺色提醒框的兩階梯凹角：邊框 6px、每階 6px，對應 淺色提醒框.svg 的實際幾何。 */
+  --pixel-frame-corners: polygon(
+    12px 0,
+    calc(100% - 12px) 0,
+    calc(100% - 12px) 6px,
+    calc(100% - 6px) 6px,
+    calc(100% - 6px) 12px,
+    100% 12px,
+    100% calc(100% - 12px),
+    calc(100% - 6px) calc(100% - 12px),
+    calc(100% - 6px) calc(100% - 6px),
+    calc(100% - 12px) calc(100% - 6px),
+    calc(100% - 12px) 100%,
+    12px 100%,
+    12px calc(100% - 6px),
+    6px calc(100% - 6px),
+    6px calc(100% - 12px),
+    0 calc(100% - 12px),
+    0 12px,
+    6px 12px,
+    6px 6px,
+    12px 6px
+  );
+  --pixel-card-corners: polygon(
+    12px 0,
+    calc(100% - 12px) 0,
+    calc(100% - 12px) 4px,
+    calc(100% - 6px) 4px,
+    calc(100% - 6px) 8px,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 6px) calc(100% - 8px),
+    calc(100% - 6px) calc(100% - 4px),
+    calc(100% - 12px) calc(100% - 4px),
+    calc(100% - 12px) 100%,
+    12px 100%,
+    12px calc(100% - 4px),
+    6px calc(100% - 4px),
+    6px calc(100% - 8px),
+    0 calc(100% - 8px),
+    0 8px,
+    6px 8px,
+    6px 4px,
+    12px 4px
+  );
+  /* 能量條外框：同一套階梯凹角語彙縮小到 3px／6px 步階，對應能量條較小的 18px 高度。 */
+  --energy-bar-corners: polygon(
+    6px 0,
+    calc(100% - 6px) 0,
+    calc(100% - 6px) 3px,
+    calc(100% - 3px) 3px,
+    calc(100% - 3px) 6px,
+    100% 6px,
+    100% calc(100% - 6px),
+    calc(100% - 3px) calc(100% - 6px),
+    calc(100% - 3px) calc(100% - 3px),
+    calc(100% - 6px) calc(100% - 3px),
+    calc(100% - 6px) 100%,
+    6px 100%,
+    6px calc(100% - 3px),
+    3px calc(100% - 3px),
+    3px calc(100% - 6px),
+    0 calc(100% - 6px),
+    0 6px,
+    3px 6px,
+    3px 3px,
+    6px 3px
+  );
+  /* 能量條內層白色軌道：單階凹角，對應外框內縮一個邊框厚度（3px）。 */
+  --energy-bar-track-corners: polygon(
+    3px 0,
+    calc(100% - 3px) 0,
+    calc(100% - 3px) 3px,
+    100% 3px,
+    100% calc(100% - 3px),
+    calc(100% - 3px) calc(100% - 3px),
+    calc(100% - 3px) 100%,
+    3px 100%,
+    3px calc(100% - 3px),
+    0 calc(100% - 3px),
+    0 3px,
+    3px 3px
+  );
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: #d6d6d6;
+  color: var(--color-ink);
+  font-family: var(--font-rounded);
+}
+
+button {
+  color: inherit;
+  font: inherit;
+}
+
+button:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.trip-app-shell {
+  background: var(--color-page);
+  height: 100dvh;
+  margin: 0 auto;
+  min-height: 0;
+  max-width: var(--content-width);
+  overflow: hidden;
+  position: relative;
+}
+
+.trip-app-content {
+  height: calc(
+    100dvh - var(--bottom-navigation-height) - env(safe-area-inset-bottom)
+  );
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  padding-bottom: 0;
+}
+
+.trip-hero {
+  background: var(--color-brand);
+  height: 240px;
+  overflow: hidden;
+  padding: 48px 0 0;
+  position: relative;
+}
+
+.trip-hero::before {
+  background-image: radial-gradient(rgb(255 247 212 / 18%) 1px, transparent 1.5px);
+  background-position: 2px 4px;
+  background-size: 9px 9px;
+  bottom: 0;
+  content: "";
+  height: 148px;
+  left: 0;
+  mask-image: linear-gradient(
+    to top,
+    #000 0 34%,
+    rgb(0 0 0 / 68%) 57%,
+    rgb(0 0 0 / 24%) 78%,
+    transparent 100%
+  );
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  z-index: 0;
+}
+
+/* 天空層：雲飄在標題與地面景物之後，純裝飾不接受點擊。 */
+.trip-hero-sky {
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 0;
+}
+
+.trip-hero-sky img {
+  image-rendering: pixelated;
+  position: absolute;
+  will-change: transform;
+}
+
+.trip-hero-cloud-left {
+  animation: trip-cloud-drift-near 15s ease-in-out infinite;
+  height: 23px;
+  left: 40px;
+  top: 32px;
+  width: 48px;
+}
+
+.trip-hero-cloud-right {
+  animation: trip-cloud-drift-far 21s ease-in-out infinite;
+  height: 28px;
+  right: 6px;
+  top: 12px;
+  width: 49px;
+}
+
+/* 兩朵雲同向漂移（像被同一陣風推），但幅度與週期不同，避免整齊同步。 */
+@keyframes trip-cloud-drift-near {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(28px);
+  }
+}
+
+@keyframes trip-cloud-drift-far {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(18px);
+  }
+}
+
+.trip-hero-scene {
+  bottom: 0;
+  height: 161px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  z-index: 1;
+}
+
+.trip-hero-scene img {
+  image-rendering: pixelated;
+  position: absolute;
+  z-index: 1;
+}
+
+.trip-hero-tree {
+  bottom: 0;
+  height: 133px;
+  left: 9px;
+}
+
+.trip-hero-pines {
+  bottom: 0;
+  height: 105px;
+  right: -12px;
+}
+
+.trip-hero-bus {
+  animation: trip-bus-pixel-drive 1.6s steps(1, end) infinite;
+  bottom: -4px;
+  height: 83px;
+  left: 194px;
+  will-change: transform;
+}
+
+@keyframes trip-bus-pixel-drive {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  25% {
+    transform: translate(3px, -1px);
+  }
+
+  50% {
+    transform: translate(8px, 0);
+  }
+
+  75% {
+    transform: translate(4px, -2px);
+  }
+}
+
+.trip-hero-copy {
+  position: relative;
+  text-align: center;
+  z-index: 2;
+}
+
+.trip-hero h1,
+.itinerary-header h1,
+.backpack-view h1 {
+  color: #fff7d4;
+  font-family: var(--font-rounded);
+  font-size: 30px;
+  font-synthesis: none;
+  font-weight: 700;
+  letter-spacing: -1.5px;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.trip-hero p {
+  color: #fff7d4;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 14px;
+  font-weight: 700;
+  margin: 7px 0 0;
+}
+
+.trip-hero h1 {
+  font-size: 36px;
+  line-height: 53px;
+}
+
+.home-content {
+  background-image: radial-gradient(rgb(104 82 78 / 5%) 1px, transparent 1.5px);
+  background-position: 5px 8px;
+  background-size: 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 493px;
+  padding: 32px 23px 14px 32px;
+  position: relative;
+}
+
+.home-content.phase-active,
+.home-content.phase-en_route,
+.home-content.phase-resting {
+  padding-top: 46px;
+}
+
+.home-content.phase-pre_trip {
+  gap: 0;
+  padding-top: 47px;
+}
+
+.pixel-frame {
+  background: var(--color-panel);
+  border: 3px solid var(--color-ink);
+  box-shadow: 4px 4px 0 rgb(109 80 75 / 18%);
+}
+
+.home-loading-card,
+.home-error-card,
+.backpack-placeholder,
+.itinerary-empty-card {
+  display: grid;
+  gap: 10px;
+  padding: 22px;
+  text-align: center;
+}
+
+.home-loading-card p,
+.home-error-card p,
+.itinerary-empty-card p {
+  font-size: 16px;
+  margin: 0;
+}
+
+.home-error-card button,
+.home-data-note button {
+  background: var(--color-brand-dark);
+  border: 0;
+  color: #fff;
+  cursor: pointer;
+  min-height: 44px;
+  padding: 8px 16px;
+}
+
+/*
+ * 容器高度刻意不跟著角色素材（191px）長高：角色往下溢出，
+ * 由 .pretrip-checklist（margin-top 負值 + 較高 z-index）蓋住腳，
+ * 形成角色站在卡片後方的層次。
+ */
+.pretrip-dialogue {
+  height: 158px;
+  margin-left: 42px;
+  position: relative;
+  width: 252px;
+}
+
+
+.character-dialogue-bubble {
+  background: var(--color-ink);
+  clip-path: polygon(
+    6px 0,
+    calc(100% - 6px) 0,
+    calc(100% - 6px) 3px,
+    calc(100% - 3px) 3px,
+    calc(100% - 3px) 6px,
+    100% 6px,
+    100% calc(100% - 6px),
+    calc(100% - 3px) calc(100% - 6px),
+    calc(100% - 3px) calc(100% - 3px),
+    calc(100% - 6px) calc(100% - 3px),
+    calc(100% - 6px) 100%,
+    6px 100%,
+    6px calc(100% - 3px),
+    3px calc(100% - 3px),
+    3px calc(100% - 6px),
+    0 calc(100% - 6px),
+    0 6px,
+    3px 6px,
+    3px 3px,
+    6px 3px
+  );
+  left: 0;
+  position: absolute;
+  top: 0;
+  z-index: 2;
+}
+
+.character-dialogue-bubble::before {
+  background: var(--color-panel);
+  clip-path: polygon(
+    4px 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 2px,
+    calc(100% - 2px) 2px,
+    calc(100% - 2px) 4px,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 2px) calc(100% - 4px),
+    calc(100% - 2px) calc(100% - 2px),
+    calc(100% - 4px) calc(100% - 2px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    4px calc(100% - 2px),
+    2px calc(100% - 2px),
+    2px calc(100% - 4px),
+    0 calc(100% - 4px),
+    0 4px,
+    2px 4px,
+    2px 2px,
+    4px 2px
+  );
+  content: "";
+  inset: 3px;
+  position: absolute;
+  z-index: 0;
+}
+
+.character-dialogue-bubble p {
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.character-dialogue-artwork {
+  image-rendering: pixelated;
+  position: absolute;
+  right: 0;
+  z-index: 3;
+}
+
+.pretrip-checklist {
+  background: var(--color-ink);
+  border: 0;
+  box-shadow: none;
+  clip-path: polygon(
+    6px 0,
+    calc(100% - 6px) 0,
+    calc(100% - 6px) 3px,
+    calc(100% - 3px) 3px,
+    calc(100% - 3px) 6px,
+    100% 6px,
+    100% calc(100% - 6px),
+    calc(100% - 3px) calc(100% - 6px),
+    calc(100% - 3px) calc(100% - 3px),
+    calc(100% - 6px) calc(100% - 3px),
+    calc(100% - 6px) 100%,
+    6px 100%,
+    6px calc(100% - 3px),
+    3px calc(100% - 3px),
+    3px calc(100% - 6px),
+    0 calc(100% - 6px),
+    0 6px,
+    3px 6px,
+    3px 3px,
+    6px 3px
+  );
+  filter: drop-shadow(4px 4px 0 rgb(109 80 75 / 18%));
+  margin-top: -29px;
+  min-height: 249px;
+  padding: 0;
+  position: relative;
+  width: 330px;
+  z-index: 1;
+}
+
+.pretrip-checklist::before {
+  background: var(--color-panel);
+  clip-path: polygon(
+    4px 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 2px,
+    calc(100% - 2px) 2px,
+    calc(100% - 2px) 4px,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 2px) calc(100% - 4px),
+    calc(100% - 2px) calc(100% - 2px),
+    calc(100% - 4px) calc(100% - 2px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    4px calc(100% - 2px),
+    2px calc(100% - 2px),
+    2px calc(100% - 4px),
+    0 calc(100% - 4px),
+    0 4px,
+    2px 4px,
+    2px 2px,
+    4px 2px
+  );
+  content: "";
+  inset: 3px;
+  position: absolute;
+  z-index: 0;
+}
+
+.pretrip-checklist-title {
+  display: block;
+  font-size: 18px;
+  line-height: 1.2;
+  padding: 21px 20px 6px;
+  position: relative;
+  z-index: 1;
+}
+
+.pretrip-checklist-items {
+  list-style: none;
+  margin: 0;
+  padding: 0 20px 6px;
+  position: relative;
+  z-index: 1;
+}
+
+.pretrip-checklist-items li {
+  align-items: center;
+  border-bottom: 1px solid var(--color-line);
+  display: flex;
+  font-size: 13px;
+  min-height: 36px;
+}
+
+.pretrip-checklist-items li:last-child {
+  border-bottom: 0;
+}
+
+.pretrip-checklist-item {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  font-family: var(--font-rounded);
+  font-synthesis: none;
+  font-weight: 400;
+  min-height: 35px;
+  width: 100%;
+}
+
+.pretrip-checklist-item input {
+  accent-color: var(--color-brand-dark);
+  height: 14px;
+  margin: 0 7px 0 0;
+  width: 14px;
+}
+
+.pretrip-checklist-item .is-completed {
+  color: rgb(104 82 78 / 42%);
+  text-decoration: line-through;
+}
+
+.pretrip-checklist-form {
+  border-top: 1px solid var(--color-ink);
+  min-height: 98px;
+  position: relative;
+  z-index: 1;
+}
+
+.pretrip-checklist-form textarea {
+  background: transparent;
+  border: 0;
+  color: var(--color-ink);
+  display: block;
+  font-family: var(--font-rounded);
+  font-size: 13px;
+  font-synthesis: none;
+  font-weight: 400;
+  height: 97px;
+  outline: 0;
+  padding: 14px 76px 14px 20px;
+  resize: none;
+  width: 100%;
+}
+
+.pretrip-checklist-form textarea::placeholder {
+  color: rgb(104 82 78 / 32%);
+}
+
+.pretrip-checklist-form textarea:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--color-accent);
+}
+
+.pretrip-checklist-form button {
+  background: var(--color-ink);
+  border: 0;
+  bottom: 16px;
+  color: var(--color-panel);
+  cursor: pointer;
+  height: 40px;
+  min-height: 40px;
+  min-width: 52px;
+  padding: 0;
+  position: absolute;
+  right: 20px;
+  width: 52px;
+}
+
+.pretrip-checklist-form button:disabled {
+  cursor: default;
+}
+
+.pretrip-dialogue .character-dialogue-bubble {
+  height: 100px;
+  width: 176px;
+  z-index: 3;
+}
+
+.pretrip-dialogue .character-dialogue-bubble p {
+  font-size: 15px;
+  line-height: 1.45;
+  padding: 18px 20px;
+}
+
+/* 往右挪開，避免對話框蓋到小旅人的臉。尺寸由 dialogue-character.ts 決定。 */
+.pretrip-dialogue .character-dialogue-artwork {
+  right: -35px;
+  top: -18px;
+  z-index: 0;
+}
+
+/* 高度刻意不跟著角色素材長高：角色往下溢出、腳被底部導覽切掉是預期的。 */
+.complete-dialogue {
+  height: 158px;
+  margin-left: 42px;
+  margin-top: 20px;
+  position: relative;
+  width: 252px;
+}
+
+.complete-dialogue .character-dialogue-bubble {
+  width: 176px;
+  z-index: 3;
+}
+
+.complete-dialogue .character-dialogue-bubble p {
+  font-size: 15px;
+  line-height: 1.45;
+  padding: 18px 20px;
+}
+
+/* 往右挪開避免對話框蓋到臉。尺寸由 dialogue-character.ts 決定。 */
+.complete-dialogue .character-dialogue-artwork {
+  right: -35px;
+  top: 0;
+  z-index: 0;
+}
+
+/* 能量文案來自 CSV、長度不固定，因此用 min-height 讓文案折行時容器跟著長高。 */
+.home-progress {
+  align-items: flex-start;
+  display: flex;
+  margin-left: 46px;
+  min-height: 60px;
+  width: 238px;
+}
+
+.home-progress-traveler {
+  flex: 0 0 48px;
+  height: 54px;
+  width: 48px;
+}
+
+.home-progress-status {
+  display: grid;
+  gap: 3px;
+  margin-left: 10px;
+  margin-top: 10px;
+}
+
+.home-progress-status span {
+  font-size: 12px;
+  line-height: 19px;
+}
+
+.energy-bar {
+  height: 18px;
+  position: relative;
+  width: 173px;
+}
+
+.energy-bar::before,
+.energy-bar::after {
+  clip-path: var(--energy-bar-corners);
+  content: "";
+  pointer-events: none;
+  position: absolute;
+}
+
+.energy-bar::before {
+  background: var(--color-energy-shadow);
+  inset: 2px 0 -2px 0;
+  z-index: 0;
+}
+
+.energy-bar::after {
+  background: var(--color-ink);
+  inset: 0;
+  z-index: 1;
+}
+
+.energy-bar-track {
+  background: #fff;
+  clip-path: var(--energy-bar-track-corners);
+  inset: 3px;
+  overflow: hidden;
+  position: absolute;
+  z-index: 2;
+}
+
+.energy-bar-fill {
+  background: var(--color-brand);
+  height: 100%;
+}
+
+.energy-bar-fill-tier-mid {
+  background: var(--color-energy-mid);
+}
+
+.energy-bar-fill-tier-low {
+  background: var(--color-energy-low);
+}
+
+.duck-dialogue {
+  height: 142px;
+  margin-left: 67px;
+  margin-top: 2px;
+  position: relative;
+  width: 282px;
+}
+
+.duck-dialogue .character-dialogue-bubble {
+  height: auto;
+  width: 176px;
+}
+
+.duck-dialogue .character-dialogue-bubble p {
+  font-size: 12px;
+  line-height: 1.45;
+  padding: 14px 18px;
+}
+
+/* 尺寸由 dialogue-character.ts 決定，這裡只負責定位。 */
+.duck-dialogue .character-dialogue-artwork {
+  bottom: 0;
+}
+
+.duck-dialogue.character-dialogue--duck .character-dialogue-artwork {
+  right: 10px;
+}
+
+.resting-dialogue {
+  margin-top: 24px;
+}
+
+.home-event-card {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+  position: relative;
+  width: 338px;
+}
+
+.home-event-card.phase-active,
+.home-event-card.phase-en_route,
+.home-status-card.phase-trip_complete {
+  background: transparent;
+  isolation: isolate;
+  min-height: 127px;
+}
+
+.home-event-card.phase-en_route::before,
+.home-status-card.phase-trip_complete::before,
+.home-event-card.phase-en_route::after,
+.home-status-card.phase-trip_complete::after {
+  clip-path: var(--pixel-card-corners);
+  content: "";
+  pointer-events: none;
+  position: absolute;
+}
+
+.home-event-card.phase-en_route::before,
+.home-status-card.phase-trip_complete::before {
+  background: rgb(104 82 78 / 32%);
+  inset: 4px -4px -4px 4px;
+  z-index: 0;
+}
+
+.home-event-card.phase-en_route::after,
+.home-status-card.phase-trip_complete::after {
+  background: var(--color-ink);
+  inset: 0;
+  z-index: 1;
+}
+
+/* 進行中卡片：還原淺色提醒框的雙線像素外框，並隨內容高度伸縮。 */
+.home-event-card.phase-active::before,
+.home-event-card.phase-active::after {
+  clip-path: var(--pixel-frame-corners);
+  content: "";
+  pointer-events: none;
+  position: absolute;
+}
+
+.home-event-card.phase-active::before {
+  background: rgb(104 82 78 / 30%);
+  inset: 1px -4px -1px 4px;
+  z-index: 0;
+}
+
+.home-event-card.phase-active::after {
+  background: var(--color-ink);
+  inset: 0;
+  z-index: 1;
+}
+
+.home-event-card-content {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 20px;
+  position: relative;
+  text-align: center;
+  width: 100%;
+  z-index: 2;
+}
+
+/* 內層填色打洞，讓外層深色只留下 6px 邊框環。 */
+.home-event-card.phase-active .home-event-card-content {
+  background: var(--color-page);
+  clip-path: var(--pixel-frame-corners);
+  margin: 6px;
+  padding: 16px 20px 20px;
+  width: calc(100% - 12px);
+}
+
+.event-status-label {
+  background: var(--color-ink);
+  color: #fff8e8;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 12px;
+  line-height: 1;
+  padding: 6px 9px;
+  width: fit-content;
+}
+
+.home-event-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.home-event-row {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.home-event-row + .home-event-row {
+  border-top: 1px dashed var(--color-line);
+  padding-top: 14px;
+}
+
+.home-event-title-group {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.home-event-time {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.home-event-title {
+  display: block;
+  font-size: 20px;
+  line-height: 1.3;
+}
+
+.home-event-place {
+  display: block;
+  font-size: 15px;
+}
+
+.home-event-artwork {
+  flex-shrink: 0;
+  height: 64px;
+  image-rendering: pixelated;
+  margin-bottom: 2px;
+  width: 76px;
+}
+
+.home-event-card.phase-en_route .home-event-card-content {
+  color: #fff;
+}
+
+.home-event-card.phase-en_route .event-status-label {
+  background: #fff5d4;
+  color: var(--color-ink);
+}
+
+.home-event-card.phase-en_route .home-event-row + .home-event-row {
+  border-top-color: rgb(255 255 255 / 32%);
+}
+
+.home-status-card {
+  position: relative;
+  width: 338px;
+}
+
+.home-status-card.phase-trip_complete {
+  height: 127px;
+  margin-top: 64px;
+}
+
+.home-status-card.phase-resting {
+  min-height: 127px;
+  margin-top: 18px;
+}
+
+.home-status-card-content {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  height: 100%;
+  justify-content: center;
+  padding: 18px 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.home-status-card-content strong {
+  font-size: 18px;
+}
+
+.home-status-card-content span,
+.home-status-card-content small {
+  font-size: 13px;
+}
+
+.home-status-card.phase-trip_complete .home-status-card-content {
+  color: #fff;
+  z-index: 2;
+}
+
+.data-warning {
+  color: #9a3f2f;
+  font-size: 14px;
+  margin: 0;
+  text-align: center;
+}
+
+.bottom-navigation {
+  background: #fff;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  height: calc(var(--bottom-navigation-height) + env(safe-area-inset-bottom));
+  left: 50%;
+  max-width: var(--content-width);
+  position: fixed;
+  transform: translateX(-50%);
+  width: 100%;
+  z-index: 10;
+}
+
+.bottom-navigation-button {
+  align-content: center;
+  background: #fff;
+  border: 0;
+  color: var(--color-brand-dark);
+  cursor: pointer;
+  display: grid;
+  font-size: 12px;
+  gap: 3px;
+  justify-items: center;
+  min-height: 44px;
+  padding: 5px 4px calc(5px + env(safe-area-inset-bottom));
+  position: relative;
+}
+
+.bottom-navigation-button.is-active {
+  background: var(--color-brand);
+  color: var(--color-ink);
+  font-weight: 800;
+}
+
+.bottom-navigation-mark {
+  display: none;
+}
+
+.bottom-navigation-icon {
+  height: 24px;
+  image-rendering: pixelated;
+  object-fit: contain;
+  width: 24px;
+}
+
+.bottom-navigation-label {
+  align-items: center;
+  display: inline-flex;
+  gap: 2px;
+}
+
+.bottom-navigation-notification {
+  align-items: center;
+  background: var(--color-notification);
+  color: #fff;
+  display: inline-flex;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 9px;
+  font-weight: 700;
+  height: 13px;
+  justify-content: center;
+  line-height: 1;
+  min-width: 13px;
+  padding: 1px 2px;
+}
+
+.itinerary-view {
+  background: var(--color-brand);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-rounded);
+  font-synthesis: none;
+  height: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  padding: 0;
+}
+
+.backpack-view {
+  background: var(--color-brand);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-rounded);
+  font-synthesis: none;
+  height: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  padding: 0;
+}
+
+.backpack-header {
+  align-items: center;
+  background: var(--color-brand);
+  display: flex;
+  flex: 0 0 73px;
+  height: 73px;
+  padding: 10px 32px;
+  position: sticky;
+  top: 0;
+  z-index: 4;
+}
+
+.itinerary-header {
+  align-items: center;
+  background: var(--color-brand);
+  display: flex;
+  flex: 0 0 73px;
+  height: 73px;
+  justify-content: space-between;
+  padding: 10px 32px;
+  position: sticky;
+  top: 0;
+  z-index: 4;
+}
+
+.itinerary-header h1 {
+  font-size: 36px;
+  line-height: 53px;
+}
+
+.date-switcher {
+  align-items: center;
+  display: flex;
+  height: 49px;
+}
+
+.date-switcher button {
+  background: var(--color-page);
+  border: 0;
+  color: rgb(104 82 78 / 48%);
+  cursor: pointer;
+  font-size: 13px;
+  height: 33px;
+  min-height: 33px;
+  min-width: 66.5px;
+}
+
+.date-switcher button.is-selected {
+  background: var(--color-ink);
+  color: #fff7d4;
+}
+
+.itinerary-route {
+  flex: 1;
+  margin-top: 1px;
+  min-height: 0;
+  overflow: hidden;
+  padding-left: 79px;
+  position: relative;
+  width: 100%;
+}
+
+.itinerary-scenery {
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+}
+
+.itinerary-scenery img {
+  image-rendering: pixelated;
+  position: absolute;
+}
+
+.itinerary-tree {
+  height: 161px;
+  left: -24px;
+  top: 118px;
+  width: 131px;
+}
+
+.itinerary-tree-right {
+  left: auto;
+  right: -38px;
+  top: 522px;
+}
+
+.itinerary-person {
+  bottom: auto;
+  position: absolute;
+  width: 24px;
+}
+
+.itinerary-person-one {
+  height: 74px;
+  left: 33px;
+  top: 280px;
+  width: 25px;
+}
+
+.itinerary-person-two {
+  height: 83px;
+  left: 39px;
+  top: 449px;
+  width: 40px;
+}
+
+.itinerary-person-three {
+  height: 89px;
+  left: 29px;
+  top: 545px;
+  width: 44px;
+}
+
+.itinerary-person-frame {
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: steps(1, end);
+  height: 100%;
+  inset: 0;
+  object-fit: contain;
+  object-position: center bottom;
+  position: absolute;
+  width: 100%;
+}
+
+.itinerary-person-base {
+  animation-name: itinerary-person-frame-a;
+  visibility: visible;
+}
+
+.itinerary-person-action {
+  animation-name: itinerary-person-frame-b;
+  visibility: hidden;
+}
+
+.itinerary-person-one .itinerary-person-frame {
+  animation-delay: 180ms;
+  animation-duration: 1.7s;
+}
+
+.itinerary-person-two .itinerary-person-frame {
+  animation-delay: 620ms;
+  animation-duration: 2s;
+}
+
+.itinerary-person-three .itinerary-person-frame {
+  animation-delay: 1.1s;
+  animation-duration: 3.15s;
+}
+
+@keyframes itinerary-person-frame-a {
+  0%,
+  49% {
+    visibility: visible;
+  }
+
+  50%,
+  100% {
+    visibility: hidden;
+  }
+}
+
+@keyframes itinerary-person-frame-b {
+  0%,
+  49% {
+    visibility: hidden;
+  }
+
+  50%,
+  100% {
+    visibility: visible;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .itinerary-person-base {
+    animation: none;
+    visibility: visible;
+  }
+
+  .itinerary-person-action {
+    animation: none;
+    visibility: hidden;
+  }
+}
+
+.itinerary-leaf {
+  left: 29px;
+  top: 642px;
+  width: 39px;
+}
+
+.itinerary-card-list {
+  align-content: start;
+  display: grid;
+  gap: 16px;
+  height: 100%;
+  min-height: 0;
+  padding-bottom: 24px;
+  padding-top: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.itinerary-scroll-region {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: none;
+}
+
+.itinerary-scroll-region::-webkit-scrollbar {
+  display: none;
+}
+
+.itinerary-card {
+  background: var(--color-ink);
+  border: 0;
+  box-shadow: none;
+  clip-path: polygon(
+    6px 0,
+    calc(100% - 6px) 0,
+    calc(100% - 6px) 3px,
+    calc(100% - 3px) 3px,
+    calc(100% - 3px) 6px,
+    100% 6px,
+    100% calc(100% - 6px),
+    calc(100% - 3px) calc(100% - 6px),
+    calc(100% - 3px) calc(100% - 3px),
+    calc(100% - 6px) calc(100% - 3px),
+    calc(100% - 6px) 100%,
+    6px 100%,
+    6px calc(100% - 3px),
+    3px calc(100% - 3px),
+    3px calc(100% - 6px),
+    0 calc(100% - 6px),
+    0 6px,
+    3px 6px,
+    3px 3px,
+    6px 3px
+  );
+  filter: drop-shadow(4px 4px 0 rgb(109 80 75 / 20%));
+  isolation: isolate;
+  padding: 0;
+  position: relative;
+  width: 282px;
+}
+
+.itinerary-card::before {
+  background: var(--color-panel);
+  clip-path: polygon(
+    4px 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 2px,
+    calc(100% - 2px) 2px,
+    calc(100% - 2px) 4px,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 2px) calc(100% - 4px),
+    calc(100% - 2px) calc(100% - 2px),
+    calc(100% - 4px) calc(100% - 2px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    4px calc(100% - 2px),
+    2px calc(100% - 2px),
+    2px calc(100% - 4px),
+    0 calc(100% - 4px),
+    0 4px,
+    2px 4px,
+    2px 2px,
+    4px 2px
+  );
+  content: "";
+  inset: 3px;
+  position: absolute;
+  z-index: 0;
+}
+
+.itinerary-card-content {
+  display: grid;
+  font-family: var(--font-rounded);
+  font-size: 14px;
+  font-synthesis: none;
+  font-weight: 400;
+  gap: 5px;
+  line-height: 1.35;
+  padding: 16px 18px 14px;
+  position: relative;
+  text-align: left;
+  width: 100%;
+  z-index: 1;
+}
+
+.itinerary-card-content strong {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.itinerary-card-map-link {
+  color: inherit;
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+}
+
+.itinerary-card-action {
+  background: var(--color-brand-dark);
+  border: 0;
+  color: #fff;
+  cursor: pointer;
+  justify-self: end;
+  line-height: 1.7;
+  margin-top: auto;
+  min-height: 33px;
+  padding: 6px 12px;
+}
+
+.backpack-header h1 {
+  font-size: 36px;
+  line-height: 53px;
+  margin: 0;
+}
+
+.backpack-content {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 40px 0 20px;
+  scrollbar-width: none;
+}
+
+.backpack-content::-webkit-scrollbar {
+  display: none;
+}
+
+.backpack-grid {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 24px;
+  grid-template-columns: repeat(3, 93px);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.backpack-item {
+  border: 4px solid var(--color-ink);
+  box-shadow: 4px 4px 0 rgb(109 80 75 / 18%);
+  height: 93px;
+  position: relative;
+  width: 93px;
+}
+
+.backpack-item-unlocked {
+  background: var(--color-page);
+}
+
+.backpack-item-locked {
+  background: var(--color-locked-slot);
+}
+
+/*
+ * 物品插圖的陰影統一由這裡控制：素材本身已移除 Figma 內建的 drop shadow，
+ * 確保所有物品（含後來新增的炸彈、盾牌）陰影一致，也不會被 SVG 畫布裁切。
+ */
+.backpack-item-artwork {
+  filter: drop-shadow(4px 4px 0 rgb(0 0 0 / 15%));
+  height: 93px;
+  image-rendering: pixelated;
+  object-fit: contain;
+  position: absolute;
+  right: 0;
+  top: -4px;
+  width: 93px;
+}
+
+.backpack-item-button {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  display: block;
+  height: 100%;
+  inset: 0;
+  padding: 0;
+  position: absolute;
+  width: 100%;
+}
+
+.backpack-new-badge {
+  align-items: center;
+  background: var(--color-notification);
+  color: #fff;
+  display: flex;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  height: 15px;
+  justify-content: center;
+  line-height: 1;
+  min-width: 33px;
+  padding: 2px 4px;
+  position: absolute;
+  right: 5px;
+  top: -10px;
+  z-index: 3;
+}
+
+.backpack-dialogue-row {
+  flex: 0 0 117px;
+  height: 117px;
+  margin-top: clamp(56px, 10dvh, 82px);
+  position: relative;
+  width: 261px;
+}
+
+.backpack-dialogue-bubble {
+  left: 0;
+  min-height: 77px;
+  padding: 14px 20px;
+  position: relative;
+  top: 10px;
+  width: 172px;
+}
+
+.backpack-dialogue-bubble p {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 24px;
+  margin: 0;
+}
+
+.backpack-guide {
+  height: 117px;
+  image-rendering: pixelated;
+  object-fit: contain;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 91px;
+}
+
+.sheet-overlay {
+  background: var(--color-overlay);
+  inset: 0;
+  position: fixed;
+  z-index: 20;
+}
+
+.bottom-sheet {
+  animation: sheet-enter 180ms ease-out;
+  background: #fff;
+  bottom: 0;
+  color: var(--color-ink);
+  left: 50%;
+  max-height: min(496px, calc(100dvh - 80px));
+  max-width: var(--content-width);
+  overflow: auto;
+  padding: 0 0 env(safe-area-inset-bottom);
+  position: absolute;
+  transform: translateX(-50%);
+  width: 100%;
+}
+
+.bottom-sheet:focus {
+  outline: none;
+}
+
+.bottom-sheet-handle {
+  display: none;
+}
+
+.bottom-sheet-header {
+  align-items: center;
+  display: flex;
+  height: 76px;
+  justify-content: space-between;
+  padding: 16px 22px 24px 32px;
+}
+
+.bottom-sheet-header h2 {
+  font-size: 24px;
+  line-height: 36px;
+  margin: 0;
+}
+
+.bottom-sheet-close {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 34px;
+  height: 44px;
+  justify-content: center;
+  line-height: 1;
+  width: 44px;
+}
+
+.bottom-sheet-event {
+  display: none;
+}
+
+.car-assignment-list {
+  display: grid;
+  margin: 0 32px;
+  width: 329px;
+}
+
+.car-assignment-row {
+  align-items: start;
+  border-bottom: 1px solid var(--color-line);
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 89px 224px;
+  margin-bottom: 24px;
+  min-height: 97px;
+  padding: 0 0 23px;
+}
+
+.car-assignment-row:last-child {
+  border-bottom: 0;
+  margin-bottom: 0;
+}
+
+.car-assignment-icon {
+  height: 43px;
+  image-rendering: pixelated;
+  object-fit: contain;
+  width: 89px;
+}
+
+.car-assignment-row h3,
+.car-assignment-row p {
+  font-size: 14px;
+  line-height: 21px;
+  margin: 0;
+}
+
+.car-assignment-row h3 {
+  font-size: 20px;
+  line-height: 30px;
+  margin-bottom: 1px;
+}
+
+.bottom-sheet-placeholder,
+.event-info-list {
+  font-size: 16px;
+  line-height: 1.7;
+  margin: 0 32px;
+}
+
+.backpack-item-sheet-body {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px 32px 32px;
+  text-align: center;
+}
+
+.backpack-item-sheet-artwork {
+  filter: drop-shadow(4px 4px 0 rgb(0 0 0 / 15%));
+  height: 93px;
+  image-rendering: pixelated;
+  margin-bottom: 8px;
+  width: 93px;
+}
+
+.backpack-item-sheet-name {
+  font-size: 20px;
+}
+
+.backpack-item-sheet-copy {
+  color: var(--color-ink);
+  font-size: 16px;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.room-assignment-list {
+  display: grid;
+  margin: 0 32px;
+  width: 329px;
+}
+
+.room-assignment-row {
+  align-items: center;
+  border-bottom: 1px solid var(--color-line);
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 69px 1fr;
+  min-height: 120px;
+  padding: 20px 0;
+}
+
+.room-assignment-row:last-child {
+  border-bottom: 0;
+}
+
+.room-assignment-icon {
+  image-rendering: pixelated;
+}
+
+.room-assignment-row h3,
+.room-assignment-row p {
+  font-size: 14px;
+  line-height: 21px;
+  margin: 0;
+}
+
+.room-assignment-row h3 {
+  font-size: 20px;
+  line-height: 30px;
+  margin-bottom: 3px;
+}
+
+.menu-artwork-list {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  margin: 0 32px 14px;
+}
+
+.menu-artwork-icon {
+  image-rendering: pixelated;
+  object-fit: contain;
+}
+
+.event-info-list {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+}
+
+.event-info-list li {
+  border-bottom: 1px solid var(--color-line);
+  list-style: none;
+  padding-bottom: 12px;
+}
+
+@keyframes sheet-enter {
+  from {
+    transform: translate(-50%, 100%);
+  }
+
+  to {
+    transform: translate(-50%, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bottom-sheet {
+    animation: none;
+  }
+
+  .trip-hero-bus {
+    animation: none;
+  }
+
+  .trip-hero-cloud-left,
+  .trip-hero-cloud-right {
+    animation: none;
+  }
+}
+
+@media (min-width: 520px) {
+  .trip-app-shell {
+    box-shadow: 0 0 40px rgb(60 60 60 / 18%);
+  }
+}
