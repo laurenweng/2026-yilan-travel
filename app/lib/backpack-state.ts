@@ -2,6 +2,7 @@ import {
   backpackCatalogById,
   backpackSlots,
   type BackpackArtwork,
+  type BackpackDetailArtwork,
   type BackpackItemId,
 } from "./backpack-catalog";
 
@@ -11,6 +12,7 @@ export type BackpackDisplayItem = {
   artwork: BackpackArtwork;
   /** 只在已解鎖且找到對應行程時才有值；用來決定物品格是否可點開 Bottom Sheet。 */
   copy?: string;
+  detailArtwork?: BackpackDetailArtwork;
   id: BackpackItemId;
   isNew: boolean;
   isUnlocked: boolean;

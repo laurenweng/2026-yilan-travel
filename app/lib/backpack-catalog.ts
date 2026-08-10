@@ -11,32 +11,42 @@ export type BackpackItemId =
   | "shield";
 
 export type BackpackArtwork =
-  | "蘋果.svg"
+  | "照片.svg"
   | "飲料.svg"
   | "眼睛.svg"
   | "愛心.svg"
   | "星星.svg"
   | "藥水.svg"
   | "閃電.svg"
-  | "烤雞.svg"
+  | "炸雞.svg"
   | "青蛙.svg"
   | "盾牌.svg";
 
+export type BackpackDetailArtwork = "大合照.png";
+
 export type BackpackCatalogItem = {
+  aliases?: readonly string[];
   artwork: BackpackArtwork;
+  detailArtwork?: BackpackDetailArtwork;
   id: BackpackItemId;
   name: string;
 };
 
 export const backpackCatalog: BackpackCatalogItem[] = [
-  { artwork: "蘋果.svg", id: "apple", name: "蘋果" },
+  {
+    aliases: ["蘋果"],
+    artwork: "照片.svg",
+    detailArtwork: "大合照.png",
+    id: "apple",
+    name: "大合照",
+  },
   { artwork: "飲料.svg", id: "drink", name: "飲料" },
   { artwork: "眼睛.svg", id: "eyes", name: "眼睛" },
   { artwork: "愛心.svg", id: "heart", name: "愛心" },
   { artwork: "星星.svg", id: "star", name: "星星" },
   { artwork: "藥水.svg", id: "potion", name: "藥水" },
   { artwork: "閃電.svg", id: "lightning", name: "閃電" },
-  { artwork: "烤雞.svg", id: "fried-chicken", name: "甕缸雞腿" },
+  { artwork: "炸雞.svg", id: "fried-chicken", name: "甕缸雞腿" },
   { artwork: "青蛙.svg", id: "bomb", name: "宜蘭青蛙怪" },
   { artwork: "盾牌.svg", id: "shield", name: "盾牌" },
 ];
@@ -72,7 +82,8 @@ export const findBackpackItemByArtwork = (value?: string) => {
     backpackCatalog.find(
       (item) =>
         item.name === normalizedValue ||
-        normalizeArtworkName(item.artwork) === normalizedValue,
+        normalizeArtworkName(item.artwork) === normalizedValue ||
+        (item.aliases?.includes(normalizedValue) ?? false),
     ) ?? null
   );
 };

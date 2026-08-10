@@ -66,6 +66,7 @@ export const resolveBackpackDisplay = (
     return {
       artwork: catalogItem.artwork,
       copy: winningItemId ? rewardEntryByItemId.get(winningItemId)?.copy : undefined,
+      detailArtwork: catalogItem.detailArtwork,
       id: catalogItem.id,
       isNew,
       isUnlocked,

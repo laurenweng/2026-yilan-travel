@@ -1667,6 +1667,12 @@ button:focus-visible {
   width: 93px;
 }
 
+.backpack-item-sheet-detail-artwork {
+  height: auto;
+  max-width: 329px;
+  width: 100%;
+}
+
 .backpack-item-sheet-name {
   font-size: 20px;
 }

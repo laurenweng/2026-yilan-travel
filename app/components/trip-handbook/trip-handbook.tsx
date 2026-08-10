@@ -29,6 +29,10 @@ import {
 } from "../../lib/itinerary-date";
 import { loadTripEventsWithFallback } from "../../lib/trip-csv";
 import { resolveTripSnapshot } from "../../lib/trip-time";
+import {
+  getTravelerGenderFromSearch,
+  type TravelerGender,
+} from "../../lib/traveler-gender";
 import type { TripDataWarning, TripEvent } from "../../lib/trip-types";
 import { BackpackItemSheet } from "./backpack-item-sheet";
 import { BackpackView } from "./backpack-view";
@@ -49,6 +53,12 @@ const readPreviewMode = () => {
   if (process.env.NODE_ENV !== "development") return null;
 
   return new URLSearchParams(window.location.search).get("preview");
+};
+
+const readTravelerGender = (): TravelerGender => {
+  if (typeof window === "undefined") return "male";
+
+  return getTravelerGenderFromSearch(window.location.search);
 };
 
 const isBackpackVisualPreviewMode = (previewMode: string | null) =>
@@ -74,6 +84,7 @@ export const TripHandbook = () => {
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [warnings, setWarnings] = useState<TripDataWarning[]>([]);
   const [previewMode] = useState(readPreviewMode);
+  const [travelerGender] = useState(readTravelerGender);
   const [initialTripTime] = useState(() => new Date());
   const backpackState = useSyncExternalStore(
     subscribeToBackpackPreview,
@@ -217,6 +228,7 @@ export const TripHandbook = () => {
             loadState={loadState}
             onRefresh={refreshTripData}
             snapshot={snapshot}
+            travelerGender={travelerGender}
             warningCount={warnings.length}
           />
         )}
@@ -264,6 +276,7 @@ export const TripHandbook = () => {
           item={backpackSession.selectedItem}
           onClose={handleCloseBackpackItemSheet}
           returnFocusTo={sheetTrigger}
+          travelerGender={travelerGender}
         />
       )}
     </main>

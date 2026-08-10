@@ -81,14 +81,14 @@ test("全解鎖背包依旅程取得順序顯示九格，第三格為宜蘭青�
 
   assert.deepEqual(artworkSources, [
     "藥水.svg",
-    "烤雞.svg",
+    "炸雞.svg",
     "盾牌.svg",
     "眼睛.svg",
     "飲料.svg",
     "愛心.svg",
     "閃電.svg",
     "星星.svg",
-    "蘋果.svg",
+    "照片.svg",
   ]);
 });
 

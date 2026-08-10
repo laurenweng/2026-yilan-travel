@@ -194,7 +194,7 @@ test("讀取第二個獎勵欄位，一個行程可同時綁定兩個物品", ()
 
   assert.equal(result.warnings.length, 0);
   assert.deepEqual(result.events[0].reward, {
-    artwork: "烤雞.svg",
+    artwork: "炸雞.svg",
     copy: "吃了香氣四溢的甕缸雞腿，獲得滿滿的力量，可以正式迎接今天的宜蘭之旅！",
     itemId: "fried-chicken",
     name: "甕缸雞腿",
@@ -528,10 +528,29 @@ test("正式 CSV 保存每個行程的能量與九個物品解鎖對應", () => 
   ]);
   assert.equal(eventsById.get("d1-dinner")?.reward?.itemId, "heart");
   assert.equal(eventsById.get("d1-free-time")?.reward?.itemId, "lightning");
-  assert.match(
-    eventsById.get("d2-home")?.reward?.copy ?? "",
-    /把這趟回憶放進心中/,
+  assert.equal(
+    eventsById.get("d2-home")?.reward?.copy,
+    "結束旅程，將所有旅行的回憶都放進心裡",
   );
+});
+
+test("正式 CSV 的蘋果解鎖對應會顯示為大合照", () => {
+  const csvText = readFileSync(
+    new URL("../public/data/trip-demo.csv", import.meta.url),
+    "utf8",
+  );
+  const result = parseTripCsv(csvText);
+  const groupPhotoReward = result.events.find(
+    (event) => event.id === "d2-home",
+  )?.reward;
+
+  assert.equal(groupPhotoReward?.artwork, "照片.svg");
+  assert.equal(
+    groupPhotoReward?.copy,
+    "結束旅程，將所有旅行的回憶都放進心裡",
+  );
+  assert.equal(groupPhotoReward?.itemId, "apple");
+  assert.equal(groupPhotoReward?.name, "大合照");
 });
 
 test("正式 CSV 的享用中餐同時綁定甕缸雞腿與炸彈兩個獎勵", () => {
@@ -544,7 +563,7 @@ test("正式 CSV 的享用中餐同時綁定甕缸雞腿與炸彈兩個獎勵", 
 
   assert.equal(eventsById.get("d1-lunch")?.reward?.itemId, "fried-chicken");
   assert.equal(eventsById.get("d1-lunch")?.reward?.name, "甕缸雞腿");
-  assert.equal(eventsById.get("d1-lunch")?.reward?.artwork, "烤雞.svg");
+  assert.equal(eventsById.get("d1-lunch")?.reward?.artwork, "炸雞.svg");
   assert.equal(eventsById.get("d1-lunch")?.reward2?.itemId, "bomb");
   assert.equal(eventsById.get("d1-laser")?.reward?.itemId, "shield");
   assert.equal(

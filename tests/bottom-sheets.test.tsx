@@ -62,6 +62,16 @@ const baseBackpackItem: BackpackDisplayItem = {
   name: "蘋果",
 };
 
+const groupPhotoBackpackItem = {
+  artwork: "照片.svg",
+  copy: "結束旅程，將所有旅行的回憶都放進心裡",
+  detailArtwork: "大合照.png",
+  id: "apple",
+  isNew: false,
+  isUnlocked: true,
+  name: "大合照",
+} as BackpackDisplayItem;
+
 test("BottomSheet 渲染標題、關閉按鈕與對話框外殼屬性", () => {
   const html = renderToStaticMarkup(
     <BottomSheet onClose={() => {}} returnFocusTo={null} title="車輛分配">
@@ -148,6 +158,53 @@ test("BackpackItemSheet 改用 BottomSheet 外殼，且不含活動標題行", (
     ).length,
     1,
   );
+});
+
+test("大合照物品在 Bottom Sheet 使用寬版詳情圖片", () => {
+  const element = BackpackItemSheet({
+    item: groupPhotoBackpackItem,
+    onClose: () => {},
+    returnFocusTo: null,
+  });
+  const detailArtwork = findElementsByClassName(
+    element.props.children,
+    "backpack-item-sheet-detail-artwork",
+  );
+
+  assert.equal(detailArtwork.length, 1);
+  assert.equal(detailArtwork[0].props.src, "/assets/yilan/大合照.png");
+  assert.equal(detailArtwork[0].props.alt, "大合照");
+});
+
+test("女生版本的大合照物品使用 g-大合照", () => {
+  const element = BackpackItemSheet({
+    item: groupPhotoBackpackItem,
+    onClose: () => {},
+    returnFocusTo: null,
+    travelerGender: "female",
+  });
+  const detailArtwork = findElementsByClassName(
+    element.props.children,
+    "backpack-item-sheet-detail-artwork",
+  );
+
+  assert.equal(detailArtwork.length, 1);
+  assert.equal(detailArtwork[0].props.src, "/assets/yilan/g-大合照.png");
+});
+
+test("大合照詳情圖片維持寬版比例且不套用像素效果", () => {
+  const stylesheet = readFileSync(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+  const detailArtworkRule =
+    stylesheet.match(/\.backpack-item-sheet-detail-artwork\s*\{[^}]*\}/s)?.[0] ?? "";
+
+  assert.match(detailArtworkRule, /height:\s*auto/);
+  assert.match(detailArtworkRule, /max-width:\s*329px/);
+  assert.match(detailArtworkRule, /width:\s*100%/);
+  assert.doesNotMatch(detailArtworkRule, /filter:/);
+  assert.doesNotMatch(detailArtworkRule, /image-rendering:/);
 });
 
 test("底部彈出視窗高度隨內容縮減，改以 max-height 限制上限", () => {
