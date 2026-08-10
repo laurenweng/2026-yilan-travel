@@ -37,6 +37,25 @@ test("警告劇情對話使用驚慌小旅人素材", () => {
   });
 });
 
+test("女生版本切換三種小旅人素材", () => {
+  assert.equal(
+    getDialogueCharacterPresentation("travelerWaving", "female").source,
+    "/assets/yilan/g-character1.svg",
+  );
+  assert.equal(
+    getDialogueCharacterPresentation("travelerWarning", "female").source,
+    "/assets/yilan/g-character2.svg",
+  );
+  assert.equal(
+    getDialogueCharacterPresentation("travelerWithMap", "female").source,
+    "/assets/yilan/g-character3.svg",
+  );
+  assert.equal(
+    getDialogueCharacterPresentation("duck", "female").source,
+    "/assets/yilan/鴨子.svg",
+  );
+});
+
 test("每個角色都指定了尺寸與素材路徑", () => {
   const characters: DialogueCharacter[] = [
     "travelerWaving",

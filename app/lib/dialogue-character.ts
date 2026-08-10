@@ -2,6 +2,12 @@
  * 首頁對話框的角色設定。各狀態要出場哪個角色由 `home-view.tsx` 決定，
  * 這裡只負責記錄每個角色的素材與尺寸。
  */
+import {
+  getTravelerArtworkName,
+  type TravelerArtworkName,
+  type TravelerGender,
+} from "./traveler-gender";
+
 export type DialogueCharacter =
   | "travelerWaving"
   | "travelerWithMap"
@@ -34,6 +40,28 @@ const dialogueCharacterPresentations = {
   },
 } as const;
 
+const travelerArtworkNames: Record<
+  Exclude<DialogueCharacter, "duck">,
+  TravelerArtworkName
+> = {
+  travelerWaving: "character1.svg",
+  travelerWithMap: "character3.svg",
+  travelerWarning: "character2.svg",
+};
+
 export const getDialogueCharacterPresentation = (
   character: DialogueCharacter,
-) => dialogueCharacterPresentations[character];
+  travelerGender: TravelerGender = "male",
+) => {
+  const presentation = dialogueCharacterPresentations[character];
+
+  if (character === "duck") return presentation;
+
+  return {
+    ...presentation,
+    source: `/assets/yilan/${getTravelerArtworkName(
+      travelerArtworkNames[character],
+      travelerGender,
+    )}`,
+  };
+};

@@ -1,6 +1,10 @@
 import Image from "next/image";
 import { getHomeEventArtwork } from "../../lib/home-event-artwork";
 import { groupHomeEventsByTimeAndTitle } from "../../lib/home-event-groups";
+import {
+  getTravelerArtworkName,
+  type TravelerGender,
+} from "../../lib/traveler-gender";
 import type { TripEvent, TripPhase, TripSnapshot } from "../../lib/trip-types";
 import { resolveHomeDialogue } from "../../lib/home-dialogue";
 import { CharacterDialogue } from "./character-dialogue";
@@ -15,8 +19,18 @@ type HomeViewProps = {
   loadState: LoadState;
   onRefresh: () => void;
   snapshot: TripSnapshot | null;
+  travelerGender?: TravelerGender;
   warningCount: number;
 };
+
+const getTravelerHeadPresentation = (travelerGender: TravelerGender) => ({
+  height: travelerGender === "female" ? 48 : 54,
+  source: `/assets/yilan/${getTravelerArtworkName(
+    "head.svg",
+    travelerGender,
+  )}`,
+  width: 48,
+});
 
 const HomeEventCard = ({
   events,
@@ -85,6 +99,7 @@ export const HomeView = ({
   loadState,
   onRefresh,
   snapshot,
+  travelerGender = "male",
   warningCount,
 }: HomeViewProps) => {
   const displayEvents =
@@ -102,6 +117,7 @@ export const HomeView = ({
   const dialogue = snapshot
     ? resolveHomeDialogue(events, snapshot)
     : undefined;
+  const travelerHeadPresentation = getTravelerHeadPresentation(travelerGender);
 
   return (
     <section className="home-view">
@@ -143,6 +159,7 @@ export const HomeView = ({
               <CharacterDialogue
                 character={dialogue.character}
                 className="pretrip-dialogue"
+                travelerGender={travelerGender}
               >
                 {dialogue.copy}
               </CharacterDialogue>
@@ -154,7 +171,14 @@ export const HomeView = ({
         {loadState === "ready" && displayEvents && displayEvents.length > 0 && snapshot && (
           <>
             <div className="home-progress">
-              <Image alt="" className="home-progress-traveler" height={54} src="/assets/yilan/head.svg" unoptimized width={48} />
+              <Image
+                alt=""
+                className="home-progress-traveler"
+                height={travelerHeadPresentation.height}
+                src={travelerHeadPresentation.source}
+                unoptimized
+                width={travelerHeadPresentation.width}
+              />
               <div className="home-progress-status">
                 {energyEvents?.[0]?.energy !== undefined && (
                   <EnergyBar percent={energyEvents[0].energy} />
@@ -175,6 +199,7 @@ export const HomeView = ({
               <CharacterDialogue
                 character={dialogue.character}
                 className="duck-dialogue"
+                travelerGender={travelerGender}
               >
                 {dialogue.copy}
               </CharacterDialogue>
@@ -199,6 +224,7 @@ export const HomeView = ({
               <CharacterDialogue
                 character={dialogue.character}
                 className="duck-dialogue resting-dialogue"
+                travelerGender={travelerGender}
               >
                 {dialogue.copy}
               </CharacterDialogue>
@@ -219,6 +245,7 @@ export const HomeView = ({
               <CharacterDialogue
                 character={dialogue.character}
                 className="complete-dialogue"
+                travelerGender={travelerGender}
               >
                 {dialogue.copy}
               </CharacterDialogue>

@@ -668,6 +668,39 @@ test("能量列的角色使用 head 頭像素材", () => {
   assert.equal(traveler.props.height, 54);
 });
 
+test("女生版本的能量列使用 g-head 原始尺寸", () => {
+  const view = HomeView({
+    events: [],
+    loadState: "ready",
+    onRefresh: () => {},
+    snapshot: activeSnapshot,
+    travelerGender: "female",
+    warningCount: 0,
+  });
+  const traveler = findElementByClassName(view, "home-progress-traveler");
+
+  assert.ok(traveler);
+  assert.equal(traveler.props.src, "/assets/yilan/g-head.svg");
+  assert.equal(traveler.props.width, 48);
+  assert.equal(traveler.props.height, 48);
+});
+
+test("CharacterDialogue 將女生版本傳給角色素材解析", () => {
+  const dialogue = CharacterDialogue({
+    character: "travelerWaving",
+    children: "小旅人台詞",
+    className: "pretrip-dialogue",
+    travelerGender: "female",
+  });
+  const artwork = findElementByClassName(
+    dialogue,
+    "character-dialogue-artwork",
+  );
+
+  assert.ok(artwork);
+  assert.equal(artwork.props.src, "/assets/yilan/g-character1.svg");
+});
+
 test("主視覺天空層放兩朵雲，且不干擾輔助技術與點擊", () => {
   const view = HomeView({
     events: [],
