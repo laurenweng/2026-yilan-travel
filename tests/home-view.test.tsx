@@ -819,3 +819,44 @@ test("首頁旅程結束顯示小旅人提醒查看背包", () => {
 
   assert.ok(findElementByClassName(completeView, "complete-dialogue"));
 });
+
+test("滿版外殼消除固定 393px 上限，Hero 裝飾只會縮小不會放大", () => {
+  const stylesheet = readFileSync(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+  const appShellRule =
+    stylesheet.match(/\.trip-app-shell\s*\{[^}]*\}/s)?.[0] ?? "";
+  const skyRule =
+    stylesheet.match(/\.trip-hero-sky\s*\{[^}]*\}/s)?.[0] ?? "";
+
+  assert.doesNotMatch(appShellRule, /max-width:\s*var\(--content-width\)/);
+  assert.match(
+    stylesheet,
+    /--content-scale:\s*min\(1, calc\(100vw \/ var\(--content-width\)\)\)/,
+  );
+  assert.match(skyRule, /scale\(var\(--content-scale\)\)/);
+});
+
+test("主要卡片會在窄螢幕收窄，導覽與文字維持原始尺寸", () => {
+  const stylesheet = readFileSync(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+  const checklistRule =
+    stylesheet.match(/\.pretrip-checklist\s*\{[^}]*\}/s)?.[0] ?? "";
+  const eventCardRule =
+    stylesheet.match(/\.home-event-card\s*\{[^}]*\}/s)?.[0] ?? "";
+  const navigationRule =
+    stylesheet.match(/\.bottom-navigation\s*\{[^}]*\}/s)?.[0] ?? "";
+  const titleRule =
+    stylesheet.match(/\.trip-hero h1\s*\{[^}]*\}/s)?.[0] ?? "";
+
+  assert.match(checklistRule, /max-width:\s*330px/);
+  assert.match(checklistRule, /width:\s*100%/);
+  assert.match(eventCardRule, /max-width:\s*338px/);
+  assert.match(eventCardRule, /width:\s*100%/);
+  assert.doesNotMatch(navigationRule, /max-width:\s*var\(--content-width\)/);
+  assert.match(navigationRule, /left:\s*0/);
+  assert.doesNotMatch(titleRule, /scale\(/);
+});

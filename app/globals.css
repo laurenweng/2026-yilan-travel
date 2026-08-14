@@ -17,6 +17,7 @@
 }
 
 :root {
+  color-scheme: only light;
   --color-page: #fff5d4;
   --color-brand: #80bb82;
   --color-brand-dark: #4f9257;
@@ -32,6 +33,7 @@
   --color-energy-low: #fc3c3c;
   --color-energy-shadow: #b3b3b3;
   --content-width: 393px;
+  --content-scale: min(1, calc(100vw / var(--content-width)));
   --bottom-navigation-height: 64px;
   --font-rounded: "GenSen Rounded", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   /* 淺色提醒框的兩階梯凹角：邊框 6px、每階 6px，對應 淺色提醒框.svg 的實際幾何。 */
@@ -130,7 +132,7 @@ body {
 }
 
 body {
-  background: #d6d6d6;
+  background: var(--color-page);
   color: var(--color-ink);
   font-family: var(--font-rounded);
 }
@@ -148,11 +150,10 @@ button:focus-visible {
 .trip-app-shell {
   background: var(--color-page);
   height: 100dvh;
-  margin: 0 auto;
   min-height: 0;
-  max-width: var(--content-width);
   overflow: hidden;
   position: relative;
+  width: 100%;
 }
 
 .trip-app-content {
@@ -197,11 +198,13 @@ button:focus-visible {
 
 /* 天空層：雲飄在標題與地面景物之後，純裝飾不接受點擊。 */
 .trip-hero-sky {
-  left: 0;
+  left: 50%;
   pointer-events: none;
   position: absolute;
-  right: 0;
   top: 0;
+  transform: translateX(-50%) scale(var(--content-scale));
+  transform-origin: center top;
+  width: var(--content-width);
   z-index: 0;
 }
 
@@ -253,9 +256,11 @@ button:focus-visible {
 .trip-hero-scene {
   bottom: 0;
   height: 161px;
-  left: 0;
+  left: 50%;
   position: absolute;
-  right: 0;
+  transform: translateX(-50%) scale(var(--content-scale));
+  transform-origin: center bottom;
+  width: var(--content-width);
   z-index: 1;
 }
 
@@ -337,6 +342,7 @@ button:focus-visible {
 }
 
 .home-content {
+  align-items: center;
   background-image: radial-gradient(rgb(104 82 78 / 5%) 1px, transparent 1.5px);
   background-position: 5px 8px;
   background-size: 12px 12px;
@@ -344,7 +350,7 @@ button:focus-visible {
   flex-direction: column;
   gap: 12px;
   min-height: 493px;
-  padding: 32px 23px 14px 32px;
+  padding: 32px clamp(16px, 6vw, 27px) 14px;
   position: relative;
 }
 
@@ -398,8 +404,10 @@ button:focus-visible {
  * 形成角色站在卡片後方的層次。
  */
 .pretrip-dialogue {
+  align-self: flex-start;
   height: 158px;
-  margin-left: 42px;
+  margin-left: clamp(0px, calc(100vw - 346px), 47px);
+  max-width: 100%;
   position: relative;
   width: 252px;
 }
@@ -506,10 +514,11 @@ button:focus-visible {
   );
   filter: drop-shadow(4px 4px 0 rgb(109 80 75 / 18%));
   margin-top: -29px;
+  max-width: 330px;
   min-height: 249px;
   padding: 0;
   position: relative;
-  width: 330px;
+  width: 100%;
   z-index: 1;
 }
 
@@ -695,7 +704,7 @@ button:focus-visible {
 .home-progress {
   align-items: flex-start;
   display: flex;
-  margin-left: 46px;
+  margin-left: 0;
   min-height: 60px;
   width: 238px;
 }
@@ -767,8 +776,10 @@ button:focus-visible {
 }
 
 .duck-dialogue {
+  align-self: flex-start;
   height: 142px;
-  margin-left: 67px;
+  margin-left: clamp(0px, calc(100vw - 321px), 72px);
+  max-width: 100%;
   margin-top: 2px;
   position: relative;
   width: 282px;
@@ -804,7 +815,8 @@ button:focus-visible {
   box-shadow: none;
   padding: 0;
   position: relative;
-  width: 338px;
+  max-width: 338px;
+  width: 100%;
 }
 
 .home-event-card.phase-active,
@@ -969,7 +981,8 @@ button:focus-visible {
 
 .home-status-card {
   position: relative;
-  width: 338px;
+  max-width: 338px;
+  width: 100%;
 }
 
 .home-status-card.phase-trip_complete {
@@ -1021,10 +1034,8 @@ button:focus-visible {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   height: calc(var(--bottom-navigation-height) + env(safe-area-inset-bottom));
-  left: 50%;
-  max-width: var(--content-width);
+  left: 0;
   position: fixed;
-  transform: translateX(-50%);
   width: 100%;
   z-index: 10;
 }
@@ -1159,11 +1170,13 @@ button:focus-visible {
 }
 
 .itinerary-route {
+  align-self: center;
   flex: 1;
   margin-top: 1px;
+  max-width: var(--content-width);
   min-height: 0;
   overflow: hidden;
-  padding-left: 79px;
+  padding-left: clamp(16px, 20vw, 79px);
   position: relative;
   width: 100%;
 }
@@ -1351,9 +1364,10 @@ button:focus-visible {
   );
   filter: drop-shadow(4px 4px 0 rgb(109 80 75 / 20%));
   isolation: isolate;
+  max-width: 282px;
   padding: 0;
   position: relative;
-  width: 282px;
+  width: 100%;
 }
 
 .itinerary-card::before {
@@ -1440,6 +1454,7 @@ button:focus-visible {
   overflow-y: auto;
   padding: 40px 0 20px;
   scrollbar-width: none;
+  width: min(100%, var(--content-width));
 }
 
 .backpack-content::-webkit-scrollbar {
