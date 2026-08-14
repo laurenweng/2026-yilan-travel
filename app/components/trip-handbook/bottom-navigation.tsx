@@ -43,6 +43,7 @@ export const BottomNavigation = ({
             alt=""
             className="bottom-navigation-icon"
             height={30}
+            priority
             src={`/assets/yilan/${isActive ? item.activeIcon : item.icon}`}
             unoptimized
             width={30}

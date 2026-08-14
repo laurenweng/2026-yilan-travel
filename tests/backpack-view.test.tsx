@@ -178,6 +178,23 @@ test("N 標籤與導覽文字同層，才能跟著文字置中對齊", () => {
   assert.equal(badgesInsideLabel.length, 1);
 });
 
+test("底部導覽圖示優先載入", () => {
+  const navigation = BottomNavigation({
+    activeTab: "home",
+    onChange: () => {},
+  });
+  const navigationIcons = findElementsByClassName(
+    navigation,
+    "bottom-navigation-icon",
+  );
+
+  assert.equal(navigationIcons.length, 3);
+  assert.equal(
+    navigationIcons.every((navigationIcon) => navigationIcon.props.priority === true),
+    true,
+  );
+});
+
 test("導覽文字與 N 標籤以 inline-flex 置中並保留 2px 間距", () => {
   const stylesheet = readFileSync(
     new URL("../app/globals.css", import.meta.url),

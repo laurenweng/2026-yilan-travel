@@ -754,6 +754,30 @@ test("主視覺天空層放兩朵雲，且不干擾輔助技術與點擊", () =>
   assert.ok(findElementByClassName(view, "trip-hero-cloud-right"));
 });
 
+test("首頁主視覺圖片優先載入", () => {
+  const view = HomeView({
+    events: [],
+    loadState: "ready",
+    onRefresh: () => {},
+    snapshot: activeSnapshot,
+    warningCount: 0,
+  });
+  const firstScreenArtworkClasses = [
+    "trip-hero-cloud-left",
+    "trip-hero-cloud-right",
+    "trip-hero-tree",
+    "trip-hero-pines",
+    "trip-hero-bus",
+  ];
+
+  for (const artworkClassName of firstScreenArtworkClasses) {
+    const artwork = findElementByClassName(view, artworkClassName);
+
+    assert.ok(artwork);
+    assert.equal(artwork.props.priority, true);
+  }
+});
+
 test("雲的飄動動畫在使用者要求減少動態時停止", () => {
   const stylesheet = readFileSync(
     new URL("../app/globals.css", import.meta.url),
