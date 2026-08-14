@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readdir, readFile } from "node:fs/promises";
 import test from "node:test";
 
 const render = async () => {
@@ -20,6 +21,21 @@ const render = async () => {
       passThroughOnException() {},
     },
   );
+};
+
+const readBuiltStylesheets = async () => {
+  const assetsDirectory = new URL("../dist/client/assets/", import.meta.url);
+  const assetNames = await readdir(assetsDirectory);
+  const stylesheetNames = assetNames.filter((assetName) =>
+    assetName.endsWith(".css"),
+  );
+  const stylesheets = await Promise.all(
+    stylesheetNames.map((stylesheetName) =>
+      readFile(new URL(stylesheetName, assetsDirectory), "utf8"),
+    ),
+  );
+
+  return stylesheets.join("\n");
 };
 
 test("伺服器渲染宜蘭員旅首頁殼與三個入口", async () => {
@@ -44,4 +60,30 @@ test("初始頁面不再呈現 Sites 範本骨架", async () => {
   assert.doesNotMatch(html, /Your site is taking shape/);
   assert.doesNotMatch(html, /Building your site/);
   assert.doesNotMatch(html, /react-loading-skeleton/);
+});
+
+test("初始文件宣告網站只支援淺色模式", async () => {
+  const response = await render();
+  const html = await response.text();
+
+  assert.match(
+    html,
+    /<meta name="color-scheme" content="only light"\s*\/?>/,
+  );
+});
+
+test("初始文件將瀏覽器介面設為品牌綠色", async () => {
+  const response = await render();
+  const html = await response.text();
+
+  assert.match(html, /<meta name="theme-color" content="#80bb82"\s*\/?>/);
+});
+
+test("部署樣式拒絕瀏覽器自動套用深色模式", async () => {
+  const stylesheets = await readBuiltStylesheets();
+
+  assert.match(
+    stylesheets,
+    /:root\{[^}]*color-scheme:(?:only light|light only)[;}]/,
+  );
 });
