@@ -22,7 +22,10 @@ import {
   openBackpackItem,
   resolveSessionBackpackDisplay,
 } from "../../lib/backpack-session";
-import { getPreviewTime } from "../../lib/preview-time";
+import {
+  getLiveScheduleTestTime,
+  getPreviewTime,
+} from "../../lib/preview-time";
 import {
   getInitialItineraryDate,
   type ItineraryDate,
@@ -55,6 +58,12 @@ const readPreviewMode = () => {
   return new URLSearchParams(window.location.search).get("preview");
 };
 
+const readLiveScheduleTestMode = () => {
+  if (typeof window === "undefined") return null;
+
+  return new URLSearchParams(window.location.search).get("test");
+};
+
 const readTravelerGender = (): TravelerGender => {
   if (typeof window === "undefined") return "male";
 
@@ -84,6 +93,7 @@ export const TripHandbook = () => {
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [warnings, setWarnings] = useState<TripDataWarning[]>([]);
   const [previewMode] = useState(readPreviewMode);
+  const [liveScheduleTestMode] = useState(readLiveScheduleTestMode);
   const [travelerGender] = useState(readTravelerGender);
   const [initialTripTime] = useState(() => new Date());
   const backpackState = useSyncExternalStore(
@@ -96,7 +106,12 @@ export const TripHandbook = () => {
   );
   const [currentTime, setCurrentTime] = useState(initialTripTime);
   const [selectedItineraryDate, setSelectedItineraryDate] =
-    useState<ItineraryDate>(() => getInitialItineraryDate(initialTripTime));
+    useState<ItineraryDate>(() =>
+      getInitialItineraryDate(
+        getLiveScheduleTestTime(liveScheduleTestMode, initialTripTime) ??
+          initialTripTime,
+      ),
+    );
   const [selectedEvent, setSelectedEvent] = useState<TripEvent | null>(null);
   const [sheetTrigger, setSheetTrigger] = useState<HTMLElement | null>(null);
 
@@ -158,7 +173,11 @@ export const TripHandbook = () => {
       events,
     );
   }, [previewMode, events]);
-  const effectiveTime = previewTripTime ?? currentTime;
+  const liveScheduleTestTime = useMemo(
+    () => getLiveScheduleTestTime(liveScheduleTestMode, currentTime),
+    [currentTime, liveScheduleTestMode],
+  );
+  const effectiveTime = previewTripTime ?? liveScheduleTestTime ?? currentTime;
 
   const snapshot = useMemo(
     () => (events.length > 0 ? resolveTripSnapshot(events, effectiveTime) : null),

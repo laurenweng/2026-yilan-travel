@@ -1,7 +1,17 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getPreviewTime } from "../app/lib/preview-time.ts";
+import * as previewTimeModule from "../app/lib/preview-time.ts";
 import type { TripEvent } from "../app/lib/trip-types.ts";
+
+const getPreviewTime = previewTimeModule.getPreviewTime;
+const getLiveScheduleTestTime = <FunctionType>() => {
+  const candidate = (previewTimeModule as Record<string, unknown>)[
+    "getLiveScheduleTestTime"
+  ];
+
+  assert.equal(typeof candidate, "function", "測試網址時間對映尚未實作");
+  return candidate as FunctionType;
+};
 
 const makeEvent = (
   id: string,
@@ -79,4 +89,46 @@ test("正式環境、未知模式、超出範圍都回傳 null", () => {
   assert.equal(getPreviewTime("place-0", true, events), null);
   assert.equal(getPreviewTime("place-99", true, events), null);
   assert.equal(getPreviewTime(null, true, events), null);
+});
+
+test("test=live 將 8 月 15、16 日的目前時刻對映到正式旅程日期", () => {
+  const resolveLiveScheduleTestTime = getLiveScheduleTestTime<
+    (mode: string | null, now: Date) => Date | null
+  >();
+
+  assert.equal(
+    resolveLiveScheduleTestTime(
+      "live",
+      new Date("2026-08-15T16:50:12+08:00"),
+    )?.toISOString(),
+    "2026-08-29T08:50:12.000Z",
+  );
+  assert.equal(
+    resolveLiveScheduleTestTime(
+      "live",
+      new Date("2026-08-16T09:00:03+08:00"),
+    )?.toISOString(),
+    "2026-08-30T01:00:03.000Z",
+  );
+});
+
+test("test=live 在測試日期以外或未知模式時不改變正式時間", () => {
+  const resolveLiveScheduleTestTime = getLiveScheduleTestTime<
+    (mode: string | null, now: Date) => Date | null
+  >();
+
+  assert.equal(
+    resolveLiveScheduleTestTime(
+      "live",
+      new Date("2026-08-17T09:00:00+08:00"),
+    ),
+    null,
+  );
+  assert.equal(
+    resolveLiveScheduleTestTime(
+      "preview",
+      new Date("2026-08-15T09:00:00+08:00"),
+    ),
+    null,
+  );
 });

@@ -21,7 +21,11 @@ test("行前 Checklist 顯示三個固定準備項目", () => {
 
   assert.deepEqual(createInitialPretripChecklist(), [
     { id: "default-tableware", isCompleted: false, label: "帶環保餐具" },
-    { id: "default-toiletries", isCompleted: false, label: "攜帶盥洗用品" },
+    {
+      id: "default-toiletries",
+      isCompleted: false,
+      label: "攜帶盥洗用品（牙刷牙膏）",
+    },
     { id: "default-clothes", isCompleted: false, label: "換洗衣物" },
   ]);
 });
@@ -93,5 +97,30 @@ test("儲存內容可重新載入，損壞內容則回到預設清單", () => {
   assert.deepEqual(
     parsePretripChecklistStorage("不是 JSON"),
     createInitialPretripChecklist(),
+  );
+});
+
+test("既有儲存的盥洗用品預設項目保留勾選狀態並更新文案", () => {
+  const parsePretripChecklistStorage = getChecklistFunction<
+    (storedValue: string | null) => ChecklistItem[]
+  >("parsePretripChecklistStorage");
+
+  assert.deepEqual(
+    parsePretripChecklistStorage(
+      JSON.stringify([
+        { id: "default-tableware", isCompleted: false, label: "帶環保餐具" },
+        { id: "default-toiletries", isCompleted: true, label: "攜帶盥洗用品" },
+        { id: "default-clothes", isCompleted: false, label: "換洗衣物" },
+      ]),
+    ),
+    [
+      { id: "default-tableware", isCompleted: false, label: "帶環保餐具" },
+      {
+        id: "default-toiletries",
+        isCompleted: true,
+        label: "攜帶盥洗用品（牙刷牙膏）",
+      },
+      { id: "default-clothes", isCompleted: false, label: "換洗衣物" },
+    ],
   );
 });

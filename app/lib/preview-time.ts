@@ -5,6 +5,45 @@ import {
 import type { TripEvent } from "./trip-types";
 
 const placeModePattern = /^(after-)?place-(\d+)$/;
+const liveScheduleDateMap: Record<string, string> = {
+  "2026-08-15": "2026-08-29",
+  "2026-08-16": "2026-08-30",
+};
+
+const taipeiDateTimeFormatter = new Intl.DateTimeFormat("en-CA", {
+  day: "2-digit",
+  hour: "2-digit",
+  hourCycle: "h23",
+  minute: "2-digit",
+  month: "2-digit",
+  second: "2-digit",
+  timeZone: "Asia/Taipei",
+  year: "numeric",
+});
+
+const getTaipeiDateTimeParts = (now: Date) =>
+  Object.fromEntries(
+    taipeiDateTimeFormatter
+      .formatToParts(now)
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, part.value]),
+  ) as Record<string, string>;
+
+/**
+ * 測試網址 `?test=live`：將 8/15、8/16 的台北目前時刻平移到正式旅程日。
+ * 只用於測試網址，不會改動正式資料或一般網址的時間。
+ */
+export const getLiveScheduleTestTime = (mode: string | null, now: Date) => {
+  if (mode !== "live") return null;
+
+  const { day, hour, minute, month, second, year } = getTaipeiDateTimeParts(now);
+  const mappedDate = liveScheduleDateMap[`${year}-${month}-${day}`];
+  if (!mappedDate) return null;
+
+  return new Date(
+    `${mappedDate}T${hour}:${minute}:${second}.${String(now.getMilliseconds()).padStart(3, "0")}+08:00`,
+  );
+};
 
 /**
  * 開發預覽時間：依排序後的行程解析網址後綴。

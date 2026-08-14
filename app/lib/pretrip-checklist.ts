@@ -6,6 +6,9 @@ export type PretripChecklistItem = {
 
 export const pretripChecklistStorageKey = "yilan-trip-pretrip-checklist-v1";
 
+const legacyDefaultToiletriesLabel = "攜帶盥洗用品";
+const defaultToiletriesLabel = "攜帶盥洗用品（牙刷牙膏）";
+
 const defaultPretripChecklistItems: PretripChecklistItem[] = [
   {
     id: "default-tableware",
@@ -15,7 +18,7 @@ const defaultPretripChecklistItems: PretripChecklistItem[] = [
   {
     id: "default-toiletries",
     isCompleted: false,
-    label: "攜帶盥洗用品",
+    label: defaultToiletriesLabel,
   },
   {
     id: "default-clothes",
@@ -78,7 +81,11 @@ export const parsePretripChecklistStorage = (storedValue: string | null) => {
       return createInitialPretripChecklist();
     }
 
-    return parsedValue;
+    return parsedValue.map((item) =>
+      item.id === "default-toiletries" && item.label === legacyDefaultToiletriesLabel
+        ? { ...item, label: defaultToiletriesLabel }
+        : item,
+    );
   } catch {
     return createInitialPretripChecklist();
   }
