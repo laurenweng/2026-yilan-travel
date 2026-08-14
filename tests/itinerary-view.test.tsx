@@ -204,6 +204,22 @@ test("行程卡片列表使用獨立捲動區", () => {
   assert.ok(findElementByClassName(view, "itinerary-scroll-region"));
 });
 
+test("行程兩側樹木完整貼齊可視區域邊緣", () => {
+  const stylesheet = readFileSync(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+  const leftTreeRule = stylesheet.match(/\.itinerary-tree\s*\{[^}]*\}/s)?.[0] ?? "";
+  const rightTreeRule = stylesheet.match(
+    /\.itinerary-tree-right\s*\{[^}]*\}/s,
+  )?.[0] ?? "";
+
+  assert.match(leftTreeRule, /left:\s*0;/);
+  assert.doesNotMatch(leftTreeRule, /left:\s*-/);
+  assert.match(rightTreeRule, /right:\s*0;/);
+  assert.doesNotMatch(rightTreeRule, /right:\s*-/);
+});
+
 test("行程卡僅由操作按鈕開啟 Bottom Sheet，並保留像素邊框", () => {
   const view = ItineraryView({
     events: [vehicleItineraryEvent],

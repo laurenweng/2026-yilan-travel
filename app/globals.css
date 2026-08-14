@@ -1197,14 +1197,14 @@ button:focus-visible {
 
 .itinerary-tree {
   height: 161px;
-  left: -24px;
+  left: 0;
   top: 118px;
   width: 131px;
 }
 
 .itinerary-tree-right {
   left: auto;
-  right: -38px;
+  right: 0;
   top: 522px;
 }
 
