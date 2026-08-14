@@ -23,6 +23,12 @@ export type TripReward = {
   name: string;
 };
 
+export type RoomAssignment = {
+  artwork: "主建築.svg" | "貨櫃屋.svg";
+  details: string[];
+  name: string;
+};
+
 export type TripEvent = {
   id: string;
   date: string;
@@ -51,7 +57,7 @@ export type TripEvent = {
   /** 少數行程（如享用中餐）同時綁定兩個獎勵，解鎖時間與 reward 相同。 */
   reward2?: TripReward;
   vehicles: VehicleAssignment[];
-  roomAssignments: string[];
+  roomAssignments: RoomAssignment[];
   menuItems: string[];
   mapUrl?: string;
 };

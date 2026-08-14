@@ -5,6 +5,7 @@ import {
   getBackpackPreviewState,
   type BackpackDisplayState,
 } from "../app/lib/backpack-state.ts";
+import { backpackCatalog } from "../app/lib/backpack-catalog.ts";
 
 test("背包四種狀態依序解鎖 0、1、2、9 個物品", () => {
   const states: BackpackDisplayState[] = ["locked", "unlocked", "new", "all"];
@@ -57,4 +58,31 @@ test("背包預覽只在開發環境套用", () => {
   assert.equal(getBackpackPreviewState("backpack-all", true), "all");
   assert.equal(getBackpackPreviewState("backpack-all", false), "locked");
   assert.equal(getBackpackPreviewState("unknown", true), "locked");
+});
+
+test("背包物品使用旅程主題標題", () => {
+  const namesById = Object.fromEntries(
+    backpackCatalog.map((item) => [item.id, item.name]),
+  );
+
+  assert.deepEqual(
+    {
+      drink: namesById.drink,
+      eyes: namesById.eyes,
+      heart: namesById.heart,
+      lightning: namesById.lightning,
+      potion: namesById.potion,
+      shield: namesById.shield,
+      star: namesById.star,
+    },
+    {
+      drink: "迎賓飲料",
+      eyes: "宜蘭的眼界",
+      heart: "回憶",
+      lightning: "療癒力量",
+      potion: "神秘藥水",
+      shield: "勇氣盾牌",
+      star: "五星好評",
+    },
+  );
 });

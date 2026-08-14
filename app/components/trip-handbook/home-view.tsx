@@ -17,6 +17,7 @@ type LoadState = "loading" | "ready" | "error";
 type HomeViewProps = {
   events: TripEvent[];
   loadState: LoadState;
+  onOpenVehicle?: (event: TripEvent, triggerElement: HTMLElement) => void;
   onRefresh: () => void;
   snapshot: TripSnapshot | null;
   travelerGender?: TravelerGender;
@@ -35,13 +36,16 @@ const getTravelerHeadPresentation = (travelerGender: TravelerGender) => ({
 const HomeEventCard = ({
   events,
   label,
+  onOpenVehicle,
   phase,
 }: {
   events: TripEvent[];
   label: string;
+  onOpenVehicle?: (event: TripEvent, triggerElement: HTMLElement) => void;
   phase: Extract<TripPhase, "active" | "en_route">;
 }) => {
   const timeGroups = groupHomeEventsByTimeAndTitle(events);
+  const vehicleEvent = events.find((event) => event.action?.type === "vehicle");
 
   return (
     <div className={`home-event-card phase-${phase}`}>
@@ -89,6 +93,15 @@ const HomeEventCard = ({
             </span>
           ))}
         </span>
+        {vehicleEvent && onOpenVehicle && (
+          <button
+            className="home-event-card-action"
+            onClick={(event) => onOpenVehicle(vehicleEvent, event.currentTarget)}
+            type="button"
+          >
+            查看車輛
+          </button>
+        )}
       </span>
     </div>
   );
@@ -97,6 +110,7 @@ const HomeEventCard = ({
 export const HomeView = ({
   events,
   loadState,
+  onOpenVehicle,
   onRefresh,
   snapshot,
   travelerGender = "male",
@@ -192,6 +206,7 @@ export const HomeView = ({
             <HomeEventCard
               events={displayEvents}
               label={snapshot.phase === "active" ? "現在進行中" : "前往下一站"}
+              onOpenVehicle={onOpenVehicle}
               phase={snapshot.phase === "active" ? "active" : "en_route"}
             />
 

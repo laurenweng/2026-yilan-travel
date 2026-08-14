@@ -121,6 +121,49 @@ test("讀取交通、車輛、房間與菜單按鈕所需的行程資料", () =>
   });
 });
 
+test("房間分配以換行區分房間並以分號保留同房多張床", () => {
+  const roomAssignments = [
+    "主棟 - 2F A房｜雙人床：Linda、Lauren；雙人床：Jeff、Jeff 女兒",
+    "貨櫃屋 - A room｜雙人床：國倫、世彥",
+  ].join("\n");
+  const csvText = [
+    csvHeader,
+    [
+      "room-1",
+      "2026-08-29",
+      "17:50",
+      "18:20",
+      "民宿入住",
+      "17:50 - 18:20",
+      "富英農舍包棟民宿",
+      "",
+      "",
+      "",
+      "",
+      "看房間分配",
+      "",
+      ...Array(6).fill(""),
+      `"${roomAssignments}"`,
+      ...Array(9).fill(""),
+    ].join(","),
+  ].join("\n");
+
+  const result = parseTripCsv(csvText);
+
+  assert.deepEqual(result.events[0].roomAssignments, [
+    {
+      artwork: "主建築.svg",
+      details: ["雙人床：Linda、Lauren", "雙人床：Jeff、Jeff 女兒"],
+      name: "主棟 - 2F A房",
+    },
+    {
+      artwork: "貨櫃屋.svg",
+      details: ["雙人床：國倫、世彥"],
+      name: "貨櫃屋 - A room",
+    },
+  ]);
+});
+
 test("讀取行程能量與結束後解鎖的物品資料", () => {
   const csvText = [
     csvHeader,
@@ -158,7 +201,7 @@ test("讀取行程能量與結束後解鎖的物品資料", () => {
     artwork: "藥水.svg",
     copy: "獲得來自宜蘭的神秘藥水，喝下它，就可以看見宜蘭的另類魅力！",
     itemId: "potion",
-    name: "藥水",
+    name: "神秘藥水",
   });
 });
 

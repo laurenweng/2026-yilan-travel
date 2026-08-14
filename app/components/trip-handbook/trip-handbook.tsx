@@ -226,6 +226,7 @@ export const TripHandbook = () => {
           <HomeView
             events={events}
             loadState={loadState}
+            onOpenVehicle={handleOpenEvent}
             onRefresh={refreshTripData}
             snapshot={snapshot}
             travelerGender={travelerGender}

@@ -40,6 +40,20 @@ const findElementsByClassName = (
   ];
 };
 
+const readTextContent = (node: ReactNode): string => {
+  if (typeof node === "string" || typeof node === "number") {
+    return String(node);
+  }
+
+  if (Array.isArray(node)) {
+    return node.map(readTextContent).join("");
+  }
+
+  if (!isValidElement<{ children?: ReactNode }>(node)) return "";
+
+  return readTextContent(node.props.children);
+};
+
 const baseEvent: TripEvent = {
   date: "2026-08-29",
   displayTime: "08:30 - 10:00",
@@ -119,6 +133,95 @@ test("EventInfoSheet 改用 BottomSheet 外殼並保留活動標題行", () => {
       .length,
     1,
   );
+});
+
+test("交通資訊 Sheet 顯示行程備註內容", () => {
+  const element = EventInfoSheet({
+    actionType: "transport",
+    event: {
+      ...baseEvent,
+      note: "09:30 公司集合，搭乘遊覽車前往冬山火車站。",
+    },
+    onClose: () => {},
+    returnFocusTo: null,
+  });
+
+  assert.match(
+    readTextContent(element.props.children),
+    /09:30 公司集合，搭乘遊覽車前往冬山火車站。/,
+  );
+});
+
+test("交通資訊 Sheet 保留備註換行，並加粗每行冒號前的標籤", () => {
+  const html = renderToStaticMarkup(
+    <EventInfoSheet
+      actionType="transport"
+      event={{
+        ...baseEvent,
+        note: "集合時間：09:30\n集合地點: 公司一樓\n請準時抵達",
+      }}
+      onClose={() => {}}
+      returnFocusTo={null}
+    />,
+  );
+
+  assert.match(html, /<strong>集合時間：<\/strong>09:30<br\/>/);
+  assert.match(html, /<strong>集合地點:<\/strong> 公司一樓<br\/>/);
+  assert.match(html, /<br\/>請準時抵達/);
+});
+
+test("住宿分配顯示行程資料中的動態房間與多張床", () => {
+  const element = EventInfoSheet({
+    actionType: "room",
+    event: {
+      ...baseEvent,
+      roomAssignments: [
+        {
+          artwork: "主建築.svg",
+          details: [
+            "雙人床：Linda、Lauren",
+            "雙人床：Jeff、Jeff 女兒",
+          ],
+          name: "主棟 - 2F A房",
+        },
+        {
+          artwork: "貨櫃屋.svg",
+          details: ["雙人床：國倫、世彥"],
+          name: "貨櫃屋 - A room",
+        },
+      ],
+    },
+    onClose: () => {},
+    returnFocusTo: null,
+  });
+  const roomAssignmentRows = findElementsByClassName(
+    element.props.children,
+    "room-assignment-row",
+  );
+  const roomAssignmentText = roomAssignmentRows.map(readTextContent).join("\n");
+
+  assert.equal(roomAssignmentRows.length, 2);
+  assert.match(roomAssignmentText, /主棟 - 2F A房/);
+  assert.match(roomAssignmentText, /雙人床：Linda、Lauren/);
+  assert.match(roomAssignmentText, /雙人床：Jeff、Jeff 女兒/);
+  assert.match(roomAssignmentText, /貨櫃屋 - A room/);
+  assert.doesNotMatch(roomAssignmentText, /小王/);
+});
+
+test("房間分配尚未填寫時顯示待補提示", () => {
+  const element = EventInfoSheet({
+    actionType: "room",
+    event: baseEvent,
+    onClose: () => {},
+    returnFocusTo: null,
+  });
+  const placeholders = findElementsByClassName(
+    element.props.children,
+    "bottom-sheet-placeholder",
+  );
+
+  assert.equal(placeholders.length, 1);
+  assert.equal(readTextContent(placeholders[0]), "房間分配待補");
 });
 
 test("CarAssignmentSheet 改用 BottomSheet 外殼並保留活動標題行", () => {

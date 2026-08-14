@@ -1,9 +1,9 @@
 "use client";
 
 import Image from "next/image";
+import { Fragment } from "react";
 import {
   defaultMenuItems,
-  defaultRoomAssignments,
   getMenuArtworkWidth,
   menuArtwork,
 } from "../../lib/trip-supplement-data";
@@ -25,8 +25,26 @@ const sheetTitleByAction: Record<Exclude<TripActionType, "vehicle">, string> = {
 
 const emptyMessageByAction: Record<Exclude<TripActionType, "vehicle">, string> = {
   transport: "交通資訊待補",
-  room: "",
+  room: "房間分配待補",
   menu: "",
+};
+
+const formatTransportNote = (note: string) => {
+  const lines = note.split(/\r?\n/);
+
+  return lines.map((line, index) => {
+    const colonIndex = line.search(/[：:]/);
+    const label = colonIndex >= 0 ? line.slice(0, colonIndex + 1) : null;
+    const content = colonIndex >= 0 ? line.slice(colonIndex + 1) : line;
+
+    return (
+      <Fragment key={`${line}-${index}`}>
+        {label ? <strong>{label}</strong> : null}
+        {content}
+        {index < lines.length - 1 ? <br /> : null}
+      </Fragment>
+    );
+  });
 };
 
 export const EventInfoSheet = ({
@@ -42,24 +60,28 @@ export const EventInfoSheet = ({
     <BottomSheet onClose={onClose} returnFocusTo={returnFocusTo} title={title}>
       <p className="bottom-sheet-event">{event.title}</p>
       {actionType === "room" ? (
-        <div className="room-assignment-list">
-          {defaultRoomAssignments.map((assignment, index) => (
-            <article className="room-assignment-row" key={`${assignment.name}-${index}`}>
-              <Image
-                alt=""
-                className="room-assignment-icon"
-                height={61}
-                src={`/assets/yilan/${assignment.artwork}`}
-                unoptimized
-                width={69}
-              />
-              <div>
-                <h3>{assignment.name}</h3>
-                {assignment.details.map((detail) => <p key={detail}>{detail}</p>)}
-              </div>
-            </article>
-          ))}
-        </div>
+        event.roomAssignments.length > 0 ? (
+          <div className="room-assignment-list">
+            {event.roomAssignments.map((assignment, index) => (
+              <article className="room-assignment-row" key={`${assignment.name}-${index}`}>
+                <Image
+                  alt=""
+                  className="room-assignment-icon"
+                  height={61}
+                  src={`/assets/yilan/${assignment.artwork}`}
+                  unoptimized
+                  width={69}
+                />
+                <div>
+                  <h3>{assignment.name}</h3>
+                  {assignment.details.map((detail) => <p key={detail}>{detail}</p>)}
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="bottom-sheet-placeholder">{emptyMessageByAction.room}</p>
+        )
       ) : actionType === "menu" ? (
         <>
           <div aria-hidden="true" className="menu-artwork-list">
@@ -80,7 +102,11 @@ export const EventInfoSheet = ({
           </ul>
         </>
       ) : (
-        <p className="bottom-sheet-placeholder">{emptyMessageByAction[actionType]}</p>
+        <p className="bottom-sheet-placeholder">
+          {event.note
+            ? formatTransportNote(event.note)
+            : emptyMessageByAction[actionType]}
+        </p>
       )}
     </BottomSheet>
   );

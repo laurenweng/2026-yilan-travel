@@ -942,6 +942,18 @@ button:focus-visible {
   width: 76px;
 }
 
+.home-event-card-action {
+  background: var(--color-brand-dark);
+  border: 0;
+  color: var(--color-panel);
+  cursor: pointer;
+  font-weight: 700;
+  line-height: 1.7;
+  margin-top: 2px;
+  min-height: 33px;
+  padding: 6px 12px;
+}
+
 .home-event-card.phase-en_route .home-event-card-content {
   color: #fff;
 }

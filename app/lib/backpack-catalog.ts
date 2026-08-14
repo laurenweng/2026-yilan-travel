@@ -40,15 +40,15 @@ export const backpackCatalog: BackpackCatalogItem[] = [
     id: "apple",
     name: "大合照",
   },
-  { artwork: "飲料.svg", id: "drink", name: "飲料" },
-  { artwork: "眼睛.svg", id: "eyes", name: "眼睛" },
-  { artwork: "愛心.svg", id: "heart", name: "愛心" },
-  { artwork: "星星.svg", id: "star", name: "星星" },
-  { artwork: "藥水.svg", id: "potion", name: "藥水" },
-  { artwork: "閃電.svg", id: "lightning", name: "閃電" },
+  { artwork: "飲料.svg", id: "drink", name: "迎賓飲料" },
+  { artwork: "眼睛.svg", id: "eyes", name: "宜蘭的眼界" },
+  { artwork: "愛心.svg", id: "heart", name: "回憶" },
+  { artwork: "星星.svg", id: "star", name: "五星好評" },
+  { artwork: "藥水.svg", id: "potion", name: "神秘藥水" },
+  { artwork: "閃電.svg", id: "lightning", name: "療癒力量" },
   { artwork: "炸雞.svg", id: "fried-chicken", name: "甕缸雞腿" },
   { artwork: "青蛙.svg", id: "bomb", name: "宜蘭青蛙怪" },
-  { artwork: "盾牌.svg", id: "shield", name: "盾牌" },
+  { artwork: "盾牌.svg", id: "shield", name: "勇氣盾牌" },
 ];
 
 export const backpackCatalogById: ReadonlyMap<BackpackItemId, BackpackCatalogItem> =

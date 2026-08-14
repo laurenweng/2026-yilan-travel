@@ -638,7 +638,43 @@ test("沒有對應插圖的行程使用無插圖版型", () => {
   assert.equal(findElementByClassName(view, "home-event-artwork"), null);
 });
 
-test("首頁現在行程卡片只顯示資訊，不提供按鈕互動", () => {
+test("首頁車輛行程卡片提供查看車輛按鈕並帶回對應行程", () => {
+  const vehicleEvent: TripEvent = {
+    ...activeEvent,
+    action: { label: "看車輛分配", type: "vehicle" },
+    id: "vehicle-event",
+  };
+  let selectedEvent: TripEvent | null = null;
+  let selectedTrigger: HTMLElement | null = null;
+  const triggerElement = {} as HTMLElement;
+  const view = HomeView({
+    events: [],
+    loadState: "ready",
+    onOpenVehicle: (event, trigger) => {
+      selectedEvent = event;
+      selectedTrigger = trigger;
+    },
+    onRefresh: () => {},
+    snapshot: {
+      ...activeSnapshot,
+      currentEvent: vehicleEvent,
+      currentEvents: [vehicleEvent],
+    },
+    warningCount: 0,
+  });
+  const vehicleButton = findElementByClassName(
+    view,
+    "home-event-card-action",
+  );
+
+  assert.ok(vehicleButton);
+  assert.equal(collectText(vehicleButton), "查看車輛");
+  vehicleButton.props.onClick({ currentTarget: triggerElement });
+  assert.equal(selectedEvent, vehicleEvent);
+  assert.equal(selectedTrigger, triggerElement);
+});
+
+test("首頁非車輛行程卡片不提供查看車輛按鈕", () => {
   const view = HomeView({
     events: [],
     loadState: "ready",
@@ -650,6 +686,7 @@ test("首頁現在行程卡片只顯示資訊，不提供按鈕互動", () => {
 
   assert.ok(eventCard);
   assert.equal(eventCard.type, "div");
+  assert.equal(findElementByClassName(eventCard, "home-event-card-action"), null);
 });
 
 test("能量列的角色使用 head 頭像素材", () => {

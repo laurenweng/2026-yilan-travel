@@ -1,5 +1,6 @@
 import Papa from "papaparse";
 import type {
+  RoomAssignment,
   TripDataWarning,
   TripEvent,
   TripParseResult,
@@ -69,6 +70,26 @@ const splitList = (value?: string) =>
     .split(/[、\n]/)
     .map((item) => item.trim())
     .filter(Boolean);
+
+const parseRoomAssignments = (value?: string): RoomAssignment[] =>
+  normalizeText(value)
+    .split(/\r?\n/)
+    .map((roomLine) => roomLine.trim())
+    .filter(Boolean)
+    .map((roomLine) => {
+      const [roomName, ...roomDetailParts] = roomLine.split("｜");
+      const roomDetails = roomDetailParts
+        .join("｜")
+        .split("；")
+        .map((roomDetail) => roomDetail.trim())
+        .filter(Boolean);
+
+      return {
+        artwork: roomName.includes("貨櫃屋") ? "貨櫃屋.svg" : "主建築.svg",
+        details: roomDetails,
+        name: roomName.trim(),
+      };
+    });
 
 const isValidDate = (date: string) => {
   if (!datePattern.test(date)) return false;
@@ -321,7 +342,7 @@ export const parseTripCsv = (csvText: string): TripParseResult => {
       reward,
       reward2,
       vehicles: createVehicles(row),
-      roomAssignments: splitList(row.房間分配),
+      roomAssignments: parseRoomAssignments(row.房間分配),
       menuItems: splitList(row.菜單),
       mapUrl: readHttpsUrl(readFirstText(row.Map, row.Google地圖)),
     });

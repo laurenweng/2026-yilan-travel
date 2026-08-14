@@ -1,32 +1,3 @@
-export type RoomAssignment = {
-  artwork: "主建築.svg" | "貨櫃屋.svg";
-  details: string[];
-  name: string;
-};
-
-export const defaultRoomAssignments: RoomAssignment[] = [
-  {
-    artwork: "主建築.svg",
-    details: ["雙人床：小王", "4人床：阿明、小陳、小林"],
-    name: "主棟 - 1F",
-  },
-  {
-    artwork: "主建築.svg",
-    details: ["雙人床：小王", "雙人床：阿明、小陳、小林"],
-    name: "主棟 - 2F",
-  },
-  {
-    artwork: "貨櫃屋.svg",
-    details: ["雙人床：小陳、小林"],
-    name: "貨櫃屋 - A room",
-  },
-  {
-    artwork: "貨櫃屋.svg",
-    details: ["雙人床：阿明、小陳、小林"],
-    name: "貨櫃屋 - A room",
-  },
-];
-
 export const defaultMenuItems = [
   "主廚招待餐前小點",
   "義式檸檬沙拉",
