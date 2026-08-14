@@ -33,7 +33,6 @@
   --color-energy-low: #fc3c3c;
   --color-energy-shadow: #b3b3b3;
   --content-width: 393px;
-  --content-scale: min(1, calc(100vw / var(--content-width)));
   --bottom-navigation-height: 64px;
   --font-rounded: "GenSen Rounded", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   /* 淺色提醒框的兩階梯凹角：邊框 6px、每階 6px，對應 淺色提醒框.svg 的實際幾何。 */
@@ -199,12 +198,12 @@ button:focus-visible {
 /* 天空層：雲飄在標題與地面景物之後，純裝飾不接受點擊。 */
 .trip-hero-sky {
   left: 50%;
+  aspect-ratio: 393 / 161;
   pointer-events: none;
   position: absolute;
   top: 0;
-  transform: translateX(-50%) scale(var(--content-scale));
-  transform-origin: center top;
-  width: var(--content-width);
+  transform: translateX(-50%);
+  width: min(100%, var(--content-width));
   z-index: 0;
 }
 
@@ -216,18 +215,18 @@ button:focus-visible {
 
 .trip-hero-cloud-left {
   animation: trip-cloud-drift-near 15s ease-in-out infinite;
-  height: 23px;
-  left: 40px;
-  top: 32px;
-  width: 48px;
+  height: auto;
+  left: 10.178%;
+  top: 19.876%;
+  width: 12.214%;
 }
 
 .trip-hero-cloud-right {
   animation: trip-cloud-drift-far 21s ease-in-out infinite;
-  height: 28px;
-  right: 6px;
-  top: 12px;
-  width: 49px;
+  height: auto;
+  right: 1.527%;
+  top: 7.453%;
+  width: 12.468%;
 }
 
 /* 兩朵雲同向漂移（像被同一陣風推），但幅度與週期不同，避免整齊同步。 */
@@ -238,7 +237,7 @@ button:focus-visible {
   }
 
   50% {
-    transform: translateX(28px);
+    transform: translateX(58.333%);
   }
 }
 
@@ -249,18 +248,17 @@ button:focus-visible {
   }
 
   50% {
-    transform: translateX(18px);
+    transform: translateX(36.735%);
   }
 }
 
 .trip-hero-scene {
+  aspect-ratio: 393 / 161;
   bottom: 0;
-  height: 161px;
   left: 50%;
   position: absolute;
-  transform: translateX(-50%) scale(var(--content-scale));
-  transform-origin: center bottom;
-  width: var(--content-width);
+  transform: translateX(-50%);
+  width: min(100%, var(--content-width));
   z-index: 1;
 }
 
@@ -272,22 +270,25 @@ button:focus-visible {
 
 .trip-hero-tree {
   bottom: 0;
-  height: 133px;
-  left: 9px;
+  height: auto;
+  left: 2.29%;
+  width: 27.735%;
 }
 
 .trip-hero-pines {
   bottom: 0;
-  height: 105px;
-  right: -12px;
+  height: auto;
+  right: -3.053%;
+  width: 28.753%;
 }
 
 .trip-hero-bus {
   animation: trip-bus-pixel-drive 1.6s steps(1, end) infinite;
-  bottom: -4px;
-  height: 83px;
-  left: 194px;
+  bottom: -2.484%;
+  height: auto;
+  left: 49.364%;
   will-change: transform;
+  width: 32.824%;
 }
 
 @keyframes trip-bus-pixel-drive {
@@ -297,15 +298,15 @@ button:focus-visible {
   }
 
   25% {
-    transform: translate(3px, -1px);
+    transform: translate(2.326%, -1.205%);
   }
 
   50% {
-    transform: translate(8px, 0);
+    transform: translate(6.202%, 0);
   }
 
   75% {
-    transform: translate(4px, -2px);
+    transform: translate(3.101%, -2.41%);
   }
 }
 

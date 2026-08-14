@@ -820,22 +820,25 @@ test("首頁旅程結束顯示小旅人提醒查看背包", () => {
   assert.ok(findElementByClassName(completeView, "complete-dialogue"));
 });
 
-test("滿版外殼消除固定 393px 上限，Hero 裝飾只會縮小不會放大", () => {
+test("滿版外殼與 Hero 景物舞台不依賴 CSS 除法縮放", () => {
   const stylesheet = readFileSync(
     new URL("../app/globals.css", import.meta.url),
     "utf8",
   );
   const appShellRule =
     stylesheet.match(/\.trip-app-shell\s*\{[^}]*\}/s)?.[0] ?? "";
-  const skyRule =
-    stylesheet.match(/\.trip-hero-sky\s*\{[^}]*\}/s)?.[0] ?? "";
+  const sceneRule =
+    stylesheet.match(/\.trip-hero-scene\s*\{[^}]*\}/s)?.[0] ?? "";
+  const treeRule =
+    stylesheet.match(/\.trip-hero-tree\s*\{[^}]*\}/s)?.[0] ?? "";
 
   assert.doesNotMatch(appShellRule, /max-width:\s*var\(--content-width\)/);
-  assert.match(
-    stylesheet,
-    /--content-scale:\s*min\(1, calc\(100vw \/ var\(--content-width\)\)\)/,
-  );
-  assert.match(skyRule, /scale\(var\(--content-scale\)\)/);
+  assert.doesNotMatch(stylesheet, /100vw\s*\/\s*var\(--content-width\)/);
+  assert.match(sceneRule, /width:\s*min\(100%, var\(--content-width\)\)/);
+  assert.match(sceneRule, /aspect-ratio:\s*393\s*\/\s*161/);
+  assert.match(sceneRule, /transform:\s*translateX\(-50%\)/);
+  assert.match(treeRule, /height:\s*auto/);
+  assert.match(treeRule, /width:\s*[0-9.]+%/);
 });
 
 test("主要卡片會在窄螢幕收窄，導覽與文字維持原始尺寸", () => {

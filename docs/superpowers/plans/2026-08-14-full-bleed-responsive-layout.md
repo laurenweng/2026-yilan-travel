@@ -208,4 +208,10 @@ git add docs/superpowers/plans/2026-08-14-full-bleed-responsive-layout.md && git
 
 - Spec coverage: Task 1 覆蓋滿版背景與小螢幕插圖縮放；Task 2 覆蓋卡片收窄、字體不縮放、底部導覽與 Bottom Sheet；Task 3 覆蓋完整測試、lint 與建置。沒有未涵蓋的規格。
 - Placeholder scan: 本文件未使用 TBD、TODO、similar 或未具體化的測試步驟。
-- Interface consistency: `--content-scale` 僅由 Task 1 定義並由 Hero 舞台使用；Task 2 沿用既有 class，不增加 TypeScript API 或資料結構。
+- Interface consistency: Hero 舞台沿用既有 class，以比例座標處理縮放；Task 2 沿用既有 class，不增加 TypeScript API 或資料結構。
+
+## 部署後相容性修正
+
+- Android 瀏覽器不支援原本的 CSS 除法，導致包含 scale(var(--content-scale)) 的 transform 宣告無效，而 left: 50% 仍生效，使 Hero 景物偏到右側。
+- Hero 舞台改為 width: min(100%, var(--content-width)) 與 aspect-ratio: 393 / 161；雲、樹、車與松樹改用相對百分比位置與寬度，因此窄螢幕仍等比縮小，不依賴 CSS 除法。
+- 已新增回歸測試，確保未來不會重新引入 CSS 除法縮放。
