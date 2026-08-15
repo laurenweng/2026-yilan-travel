@@ -118,6 +118,28 @@ test("BottomSheet 的 section aria-labelledby 對應 h2 id", () => {
   assert.equal(sectionId, headingId);
 });
 
+test("Bottom sheet 的所有說明文字統一為 16px", () => {
+  const stylesheet = readFileSync(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+  const carDescriptionRule =
+    stylesheet.match(/(?:^|})\s*\.car-assignment-row p\s*\{[^}]*\}/s)?.[0] ?? "";
+  const roomDescriptionRule =
+    stylesheet.match(/(?:^|})\s*\.room-assignment-row p\s*\{[^}]*\}/s)?.[0] ?? "";
+
+  assert.match(carDescriptionRule, /font-size:\s*16px/);
+  assert.match(roomDescriptionRule, /font-size:\s*16px/);
+  assert.match(
+    stylesheet,
+    /\.bottom-sheet-placeholder,\s*\.event-info-list\s*\{[^}]*font-size:\s*16px/s,
+  );
+  assert.match(
+    stylesheet,
+    /\.backpack-item-sheet-copy\s*\{[^}]*font-size:\s*16px/s,
+  );
+});
+
 test("EventInfoSheet 改用 BottomSheet 外殼並保留活動標題行", () => {
   const element = EventInfoSheet({
     actionType: "transport",

@@ -167,6 +167,23 @@ test("日期頁籤使用第一天與第二天標籤", () => {
   assert.equal(getTextContent(dateSwitcher), "第一天第二天");
 });
 
+test("行程日期、卡片與操作按鈕使用確認後的字級", () => {
+  const stylesheet = readFileSync(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+  const getRule = (selector: string) =>
+    stylesheet.match(new RegExp(`${selector}\\s*\\{[^}]*\\}`, "s"))?.[0] ?? "";
+
+  assert.match(getRule("\\.date-switcher button"), /font-size:\s*16px/);
+  assert.match(getRule("\\.itinerary-card-content"), /font-size:\s*16px/);
+  assert.match(
+    getRule("\\.itinerary-card-content strong"),
+    /font-size:\s*20px/,
+  );
+  assert.match(getRule("\\.itinerary-card-action"), /font-size:\s*16px/);
+});
+
 test("切換到第二天時只顯示第二日行程", () => {
   const view = ItineraryView({
     events: [itineraryEvent, secondDayEvent],

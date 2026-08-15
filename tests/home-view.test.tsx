@@ -149,6 +149,31 @@ test("丸鴨對話輸出可供定位的角色 class", () => {
   assert.ok(findElementByClassName(dialogue, "character-dialogue--duck"));
 });
 
+test("首頁、Checklist 與角色對話使用確認後的字級", () => {
+  const stylesheet = readFileSync(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+  const getRule = (selector: string) =>
+    stylesheet.match(new RegExp(`${selector}\\s*\\{[^}]*\\}`, "s"))?.[0] ?? "";
+
+  assert.match(getRule("\\.trip-hero p"), /font-size:\s*18px/);
+  assert.match(getRule("\\.pretrip-checklist-title"), /font-size:\s*20px/);
+  assert.match(getRule("\\.pretrip-checklist-items li"), /font-size:\s*16px/);
+  assert.match(getRule("\\.pretrip-checklist-form textarea"), /font-size:\s*16px/);
+  assert.match(
+    getRule("\\.pretrip-dialogue \\.character-dialogue-bubble p"),
+    /font-size:\s*16px/,
+  );
+  assert.match(
+    getRule("\\.duck-dialogue \\.character-dialogue-bubble p"),
+    /font-size:\s*16px/,
+  );
+  assert.match(getRule("\\.event-status-label"), /font-size:\s*15px/);
+  assert.match(getRule("\\.home-event-time"), /font-size:\s*16px/);
+  assert.match(getRule("\\.home-event-title"), /font-size:\s*22px/);
+});
+
 const countElementsByClassName = (node: ReactNode, className: string): number => {
   if (Array.isArray(node)) {
     return node.reduce<number>(

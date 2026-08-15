@@ -211,6 +211,23 @@ test("導覽文字與 N 標籤以 inline-flex 置中並保留 2px 間距", () =>
   assert.doesNotMatch(badgeRule, /position:\s*absolute/);
 });
 
+test("背包的新物品與底部導覽使用 13px", () => {
+  const stylesheet = readFileSync(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+  const navigationRule =
+    stylesheet.match(/\.bottom-navigation-button\s*\{[^}]*\}/s)?.[0] ?? "";
+  const notificationRule =
+    stylesheet.match(/\.bottom-navigation-notification\s*\{[^}]*\}/s)?.[0] ?? "";
+  const newBadgeRule =
+    stylesheet.match(/\.backpack-new-badge\s*\{[^}]*\}/s)?.[0] ?? "";
+
+  assert.match(navigationRule, /font-size:\s*13px/);
+  assert.match(notificationRule, /font-size:\s*13px/);
+  assert.match(newBadgeRule, /font-size:\s*13px/);
+});
+
 test("背包標題與行程標題共用相同標題區尺寸", () => {
   const stylesheet = readFileSync(
     new URL("../app/globals.css", import.meta.url),

@@ -332,7 +332,7 @@ button:focus-visible {
 .trip-hero p {
   color: #fff7d4;
   font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 700;
   margin: 7px 0 0;
 }
@@ -555,7 +555,7 @@ button:focus-visible {
 
 .pretrip-checklist-title {
   display: block;
-  font-size: 18px;
+  font-size: 20px;
   line-height: 1.2;
   padding: 21px 20px 6px;
   position: relative;
@@ -574,7 +574,7 @@ button:focus-visible {
   align-items: center;
   border-bottom: 1px solid var(--color-line);
   display: flex;
-  font-size: 13px;
+  font-size: 16px;
   min-height: 36px;
 }
 
@@ -618,7 +618,7 @@ button:focus-visible {
   color: var(--color-ink);
   display: block;
   font-family: var(--font-rounded);
-  font-size: 13px;
+  font-size: 16px;
   font-synthesis: none;
   font-weight: 400;
   height: 97px;
@@ -662,7 +662,7 @@ button:focus-visible {
 }
 
 .pretrip-dialogue .character-dialogue-bubble p {
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.45;
   padding: 18px 20px;
 }
@@ -689,7 +689,7 @@ button:focus-visible {
 }
 
 .complete-dialogue .character-dialogue-bubble p {
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.45;
   padding: 18px 20px;
 }
@@ -792,7 +792,7 @@ button:focus-visible {
 }
 
 .duck-dialogue .character-dialogue-bubble p {
-  font-size: 12px;
+  font-size: 16px;
   line-height: 1.45;
   padding: 14px 18px;
 }
@@ -898,7 +898,7 @@ button:focus-visible {
   background: var(--color-ink);
   color: #fff8e8;
   font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
-  font-size: 12px;
+  font-size: 15px;
   line-height: 1;
   padding: 6px 9px;
   width: fit-content;
@@ -932,13 +932,13 @@ button:focus-visible {
 
 .home-event-time {
   display: block;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
 }
 
 .home-event-title {
   display: block;
-  font-size: 20px;
+  font-size: 22px;
   line-height: 1.3;
 }
 
@@ -1048,7 +1048,7 @@ button:focus-visible {
   color: var(--color-brand-dark);
   cursor: pointer;
   display: grid;
-  font-size: 12px;
+  font-size: 13px;
   gap: 3px;
   justify-items: center;
   min-height: 44px;
@@ -1085,7 +1085,7 @@ button:focus-visible {
   color: #fff;
   display: inline-flex;
   font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
-  font-size: 9px;
+  font-size: 13px;
   font-weight: 700;
   height: 13px;
   justify-content: center;
@@ -1159,7 +1159,7 @@ button:focus-visible {
   border: 0;
   color: rgb(104 82 78 / 48%);
   cursor: pointer;
-  font-size: 13px;
+  font-size: 16px;
   height: 33px;
   min-height: 33px;
   min-width: 66.5px;
@@ -1404,7 +1404,7 @@ button:focus-visible {
 .itinerary-card-content {
   display: grid;
   font-family: var(--font-rounded);
-  font-size: 14px;
+  font-size: 16px;
   font-synthesis: none;
   font-weight: 400;
   gap: 5px;
@@ -1417,7 +1417,7 @@ button:focus-visible {
 }
 
 .itinerary-card-content strong {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
 }
 
@@ -1432,6 +1432,7 @@ button:focus-visible {
   border: 0;
   color: #fff;
   cursor: pointer;
+  font-size: 16px;
   justify-self: end;
   line-height: 1.7;
   margin-top: auto;
@@ -1521,7 +1522,7 @@ button:focus-visible {
   color: #fff;
   display: flex;
   font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 700;
   height: 15px;
   justify-content: center;
@@ -1660,9 +1661,12 @@ button:focus-visible {
 
 .car-assignment-row h3,
 .car-assignment-row p {
-  font-size: 14px;
   line-height: 21px;
   margin: 0;
+}
+
+.car-assignment-row p {
+  font-size: 16px;
 }
 
 .car-assignment-row h3 {
@@ -1738,9 +1742,12 @@ button:focus-visible {
 
 .room-assignment-row h3,
 .room-assignment-row p {
-  font-size: 14px;
   line-height: 21px;
   margin: 0;
+}
+
+.room-assignment-row p {
+  font-size: 16px;
 }
 
 .room-assignment-row h3 {
