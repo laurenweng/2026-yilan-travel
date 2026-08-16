@@ -11,7 +11,7 @@
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
     "test": "npm run test:unit && npm run test:component && npm run test:rendered",
     "test:component": "tsx --test tests/home-view.test.tsx tests/itinerary-view.test.tsx tests/backpack-view.test.tsx tests/bottom-sheets.test.tsx tests/energy-bar.test.tsx",
-    "test:unit": "tsx --test tests/trip-csv.test.ts tests/trip-data-source.test.ts tests/trip-time.test.ts tests/car-assignment.test.ts tests/home-frame.test.ts tests/preview-time.test.ts tests/pretrip-checklist.test.ts tests/dialogue-character.test.ts tests/itinerary-date.test.ts tests/backpack-state.test.ts tests/backpack-progress.test.ts tests/backpack-session.test.ts tests/home-event-groups.test.ts tests/home-event-artwork.test.ts tests/home-dialogue.test.ts",
+    "test:unit": "tsx --test tests/trip-schedule-rules.test.ts tests/trip-csv.test.ts tests/trip-data-source.test.ts tests/trip-time.test.ts tests/car-assignment.test.ts tests/home-frame.test.ts tests/preview-time.test.ts tests/pretrip-checklist.test.ts tests/dialogue-character.test.ts tests/itinerary-date.test.ts tests/backpack-state.test.ts tests/backpack-progress.test.ts tests/backpack-session.test.ts tests/home-event-groups.test.ts tests/home-event-artwork.test.ts tests/home-dialogue.test.ts",
     "test:rendered": "npm run build && node --test tests/rendered-html.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate"
