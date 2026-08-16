@@ -4,6 +4,8 @@ import test from "node:test";
 import { isValidElement, type ReactElement, type ReactNode } from "react";
 import { CharacterDialogue } from "../app/components/trip-handbook/character-dialogue";
 import { HomeView } from "../app/components/trip-handbook/home-view";
+import { parseTripCsv } from "../app/lib/trip-csv";
+import { resolveTripSnapshot } from "../app/lib/trip-time";
 import type { TripEvent, TripSnapshot } from "../app/lib/trip-types";
 
 const activeEvent: TripEvent = {
@@ -911,4 +913,55 @@ test("主要卡片會在窄螢幕收窄，導覽與文字維持原始尺寸", ()
   assert.doesNotMatch(navigationRule, /max-width:\s*var\(--content-width\)/);
   assert.match(navigationRule, /left:\s*0/);
   assert.doesNotMatch(titleRule, /scale\(/);
+});
+
+test("共同行程取消後首頁使用新時間且不顯示共同行程", () => {
+  const originalCsvText = readFileSync(
+    new URL("../public/data/trip-demo.csv", import.meta.url),
+    "utf8",
+  );
+  const events = parseTripCsv(
+    originalCsvText.replace(
+      ",14:50 - 16:30,待確認,",
+      ",14:50 - 16:30,false,",
+    ),
+  ).events;
+
+  const winterSnapshot = resolveTripSnapshot(
+    events,
+    new Date("2026-08-29T15:00:00+08:00"),
+  );
+  const winterView = HomeView({
+    events,
+    loadState: "ready",
+    onRefresh: () => {},
+    snapshot: winterSnapshot,
+    warningCount: 0,
+  });
+  const winterCardText = collectText(
+    findElementByClassName(winterView, "home-event-card"),
+  );
+
+  assert.match(winterCardText, /14:50–16:30/);
+  assert.match(winterCardText, /冬山自由觀光/);
+  assert.doesNotMatch(winterCardText, /共同行程/);
+
+  const shoppingSnapshot = resolveTripSnapshot(
+    events,
+    new Date("2026-08-29T16:45:00+08:00"),
+  );
+  const shoppingView = HomeView({
+    events,
+    loadState: "ready",
+    onRefresh: () => {},
+    snapshot: shoppingSnapshot,
+    warningCount: 0,
+  });
+  const shoppingCardText = collectText(
+    findElementByClassName(shoppingView, "home-event-card"),
+  );
+
+  assert.match(shoppingCardText, /16:30–17:30/);
+  assert.match(shoppingCardText, /補助推薦景點/);
+  assert.match(shoppingCardText, /採買時間/);
 });

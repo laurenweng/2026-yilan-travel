@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import { isValidElement, type ReactNode } from "react";
 import { ItineraryView } from "../app/components/trip-handbook/itinerary-view";
+import { parseTripCsv } from "../app/lib/trip-csv";
 import { getMenuArtworkWidth } from "../app/lib/trip-supplement-data";
 import type { TripEvent } from "../app/lib/trip-types";
 
@@ -376,4 +377,34 @@ test("三位路人皆載入互斥的 A、B 動作影格", () => {
     findElementsByClassName(view, "itinerary-person-frame").length,
     6,
   );
+});
+
+test("共同行程取消後我的行程隱藏該卡片並顯示新時間", () => {
+  const originalCsvText = readFileSync(
+    new URL("../public/data/trip-demo.csv", import.meta.url),
+    "utf8",
+  );
+  const events = parseTripCsv(
+    originalCsvText.replace(
+      ",14:50 - 16:30,待確認,",
+      ",14:50 - 16:30,false,",
+    ),
+  ).events;
+  const view = ItineraryView({
+    events,
+    onDateChange: () => {},
+    onOpenEvent: () => {},
+    selectedDate: "2026-08-29",
+  });
+  const cardText = findElementsByClassName(view, "itinerary-card-content")
+    .map(getTextContent)
+    .join("\n");
+
+  assert.doesNotMatch(cardText, /共同行程/);
+  assert.match(
+    cardText,
+    /冬山自由觀光（推薦行程）時間｜14:50 - 16:30/,
+  );
+  assert.match(cardText, /補助推薦景點時間｜16:30 - 17:30/);
+  assert.match(cardText, /採買時間時間｜16:30 - 17:30/);
 });

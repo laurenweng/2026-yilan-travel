@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
   resolveBackpackDisplay,
@@ -7,6 +8,7 @@ import {
   SEEN_REWARDS_STORAGE_KEY,
 } from "../app/lib/backpack-progress.ts";
 import type { BackpackItemId } from "../app/lib/backpack-catalog.ts";
+import { parseTripCsv } from "../app/lib/trip-csv.ts";
 import type { TripEvent } from "../app/lib/trip-types.ts";
 
 const makeRewardEvent = (
@@ -246,5 +248,41 @@ test("序列化已讀集合為 JSON 陣列字串，可被 parseSeenRewardItemIds
   assert.deepEqual(
     [...parseSeenRewardItemIds(serialized)].sort(),
     ["fried-chicken", "potion"],
+  );
+});
+
+test("共同行程取消後眼睛改在冬山自由觀光結束時解鎖", () => {
+  const originalCsvText = readFileSync(
+    new URL("../public/data/trip-demo.csv", import.meta.url),
+    "utf8",
+  );
+  const cancelledEvents = parseTripCsv(
+    originalCsvText.replace(
+      ",14:50 - 16:30,待確認,",
+      ",14:50 - 16:30,false,",
+    ),
+  ).events;
+  const beforeEnd = resolveBackpackDisplay(
+    cancelledEvents,
+    new Date("2026-08-29T16:29:59+08:00"),
+    new Set(),
+  );
+  const atEnd = resolveBackpackDisplay(
+    cancelledEvents,
+    new Date("2026-08-29T16:30:00+08:00"),
+    new Set(),
+  );
+
+  assert.equal(
+    beforeEnd.items.find((item) => item.id === "eyes")?.isUnlocked,
+    false,
+  );
+  assert.equal(
+    atEnd.items.find((item) => item.id === "eyes")?.isUnlocked,
+    true,
+  );
+  assert.equal(
+    atEnd.items.find((item) => item.id === "eyes")?.copy,
+    "小旅行就是東看看西看看，獲得了宜蘭的眼界",
   );
 });
