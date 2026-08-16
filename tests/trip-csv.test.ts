@@ -524,6 +524,39 @@ test("略過結束時間早於開始時間的行程", () => {
   assert.match(result.warnings[0].message, /結束時間/);
 });
 
+test("G6 字串為 false 時返回取消後的統一行程", () => {
+  const originalCsvText = readFileSync(
+    new URL("../public/data/trip-demo.csv", import.meta.url),
+    "utf8",
+  );
+  const cancelledCsvText = originalCsvText.replace(
+    ",14:50 - 16:30,待確認,",
+    ",14:50 - 16:30,  FALSE  ,",
+  );
+  assert.notEqual(cancelledCsvText, originalCsvText);
+
+  const result = parseTripCsv(cancelledCsvText);
+  const eventsById = new Map(result.events.map((event) => [event.id, event]));
+
+  assert.equal(result.warnings.length, 0);
+  assert.equal(result.events.length, 17);
+  assert.equal(eventsById.has("d1-group"), false);
+  assert.deepEqual(
+    result.events.slice(4, 7).map((event) => event.id),
+    ["d1-dessert", "d1-ricecake", "d1-scallion-pancake"],
+  );
+  assert.equal(eventsById.get("d1-dessert")?.displayTime, "14:50 - 16:30");
+  assert.equal(eventsById.get("d1-ricecake")?.endTime, "16:30");
+  assert.equal(eventsById.get("d1-scallion-pancake")?.startTime, "14:50");
+  assert.equal(eventsById.get("d1-farm-park")?.displayTime, "16:30 - 17:30");
+  assert.equal(eventsById.get("d1-shopping")?.endTime, "17:30");
+  assert.equal(eventsById.get("d1-dessert")?.reward?.itemId, "eyes");
+  assert.equal(
+    result.events.filter((event) => event.reward?.itemId === "eyes").length,
+    1,
+  );
+});
+
 test("正式 CSV 提供兩日共十八個行程與四種按鈕資料", () => {
   const csvText = readFileSync(
     new URL("../public/data/trip-demo.csv", import.meta.url),

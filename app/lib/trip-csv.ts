@@ -8,6 +8,7 @@ import type {
   VehicleCode,
 } from "./trip-types";
 import { findBackpackItemByArtwork } from "./backpack-catalog";
+import { applyTripScheduleRules } from "./trip-schedule-rules";
 
 type TripCsvRow = {
   ID?: string;
@@ -348,13 +349,14 @@ export const parseTripCsv = (csvText: string): TripParseResult => {
     });
   });
 
-  events.sort((firstEvent, secondEvent) =>
+  const scheduledEvents = applyTripScheduleRules(events);
+  scheduledEvents.sort((firstEvent, secondEvent) =>
     `${firstEvent.date}T${firstEvent.startTime}`.localeCompare(
       `${secondEvent.date}T${secondEvent.startTime}`,
     ),
   );
 
-  return { events, warnings };
+  return { events: scheduledEvents, warnings };
 };
 
 /** 每次開啟或按下更新時讀取 CSV，不快取行程資料。 */
