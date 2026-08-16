@@ -1554,7 +1554,7 @@ button:focus-visible {
 
 .backpack-dialogue-bubble p {
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 400;
   line-height: 24px;
   margin: 0;
 }
@@ -1581,13 +1581,11 @@ button:focus-visible {
   background: #fff;
   bottom: 0;
   color: var(--color-ink);
-  left: 50%;
+  left: 0;
   max-height: min(496px, calc(100dvh - 80px));
-  max-width: var(--content-width);
   overflow: auto;
   padding: 0 0 env(safe-area-inset-bottom);
   position: absolute;
-  transform: translateX(-50%);
   width: 100%;
 }
 

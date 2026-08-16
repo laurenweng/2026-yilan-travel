@@ -245,6 +245,17 @@ test("背包標題與行程標題共用相同標題區尺寸", () => {
   assert.match(backpackTitleRule, /font-size:\s*36px/);
 });
 
+test("背包對話使用與首頁一致的一般字重", () => {
+  const stylesheet = readFileSync(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+  const dialogueRule =
+    stylesheet.match(/\.backpack-dialogue-bubble p\s*\{[^}]*\}/s)?.[0] ?? "";
+
+  assert.match(dialogueRule, /font-weight:\s*400/);
+});
+
 test("背包九格維持 93px 三欄與 24px 間距", () => {
   const stylesheet = readFileSync(
     new URL("../app/globals.css", import.meta.url),

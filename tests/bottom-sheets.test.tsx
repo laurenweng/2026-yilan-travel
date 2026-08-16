@@ -118,6 +118,20 @@ test("BottomSheet 的 section aria-labelledby 對應 h2 id", () => {
   assert.equal(sectionId, headingId);
 });
 
+test("Bottom sheet 貼齊可視畫面的左右邊緣", () => {
+  const stylesheet = readFileSync(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+  const bottomSheetRule =
+    stylesheet.match(/\.bottom-sheet\s*\{[^}]*\}/s)?.[0] ?? "";
+
+  assert.match(bottomSheetRule, /left:\s*0/);
+  assert.match(bottomSheetRule, /width:\s*100%/);
+  assert.doesNotMatch(bottomSheetRule, /max-width:/);
+  assert.doesNotMatch(bottomSheetRule, /transform:/);
+});
+
 test("Bottom sheet 的所有說明文字統一為 16px", () => {
   const stylesheet = readFileSync(
     new URL("../app/globals.css", import.meta.url),
