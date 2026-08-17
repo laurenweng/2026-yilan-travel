@@ -6,8 +6,8 @@ import type { TripEvent } from "./trip-types";
 
 const placeModePattern = /^(after-)?place-(\d+)$/;
 const liveScheduleDateMap: Record<string, string> = {
-  "2026-08-15": "2026-08-29",
-  "2026-08-16": "2026-08-30",
+  "2026-08-17": "2026-08-29",
+  "2026-08-18": "2026-08-30",
 };
 
 const taipeiDateTimeFormatter = new Intl.DateTimeFormat("en-CA", {
@@ -30,7 +30,7 @@ const getTaipeiDateTimeParts = (now: Date) =>
   ) as Record<string, string>;
 
 /**
- * 測試網址 `?test=live`：將 8/15、8/16 的台北目前時刻平移到正式旅程日。
+ * 測試網址 `?test=live`：將 8/17、8/18 的台北目前時刻平移到正式旅程日。
  * 只用於測試網址，不會改動正式資料或一般網址的時間。
  */
 export const getLiveScheduleTestTime = (mode: string | null, now: Date) => {

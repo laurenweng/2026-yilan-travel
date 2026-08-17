@@ -91,7 +91,7 @@ test("正式環境、未知模式、超出範圍都回傳 null", () => {
   assert.equal(getPreviewTime(null, true, events), null);
 });
 
-test("test=live 將 8 月 15、16 日的目前時刻對映到正式旅程日期", () => {
+test("test=live 將 8 月 17、18 日的目前時刻對映到正式旅程日期", () => {
   const resolveLiveScheduleTestTime = getLiveScheduleTestTime<
     (mode: string | null, now: Date) => Date | null
   >();
@@ -99,14 +99,14 @@ test("test=live 將 8 月 15、16 日的目前時刻對映到正式旅程日期"
   assert.equal(
     resolveLiveScheduleTestTime(
       "live",
-      new Date("2026-08-15T16:50:12+08:00"),
+      new Date("2026-08-17T16:50:12+08:00"),
     )?.toISOString(),
     "2026-08-29T08:50:12.000Z",
   );
   assert.equal(
     resolveLiveScheduleTestTime(
       "live",
-      new Date("2026-08-16T09:00:03+08:00"),
+      new Date("2026-08-18T09:00:03+08:00"),
     )?.toISOString(),
     "2026-08-30T01:00:03.000Z",
   );
@@ -120,14 +120,14 @@ test("test=live 在測試日期以外或未知模式時不改變正式時間", (
   assert.equal(
     resolveLiveScheduleTestTime(
       "live",
-      new Date("2026-08-17T09:00:00+08:00"),
+      new Date("2026-08-19T09:00:00+08:00"),
     ),
     null,
   );
   assert.equal(
     resolveLiveScheduleTestTime(
       "preview",
-      new Date("2026-08-15T09:00:00+08:00"),
+      new Date("2026-08-17T09:00:00+08:00"),
     ),
     null,
   );
