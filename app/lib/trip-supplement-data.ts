@@ -14,19 +14,19 @@ export const defaultMenuItems = [
 ];
 
 export type MenuArtwork =
-  | "甜甜圈.svg"
-  | "起司.svg"
-  | "魚肉.svg"
-  | "香腸.svg"
-  | "烤雞.svg";
+  | "甜甜圈.webp"
+  | "起司.webp"
+  | "魚肉.webp"
+  | "香腸.webp"
+  | "烤雞.webp";
 
 export const menuArtwork: MenuArtwork[] = [
-  "甜甜圈.svg",
-  "起司.svg",
-  "魚肉.svg",
-  "香腸.svg",
-  "烤雞.svg",
+  "甜甜圈.webp",
+  "起司.webp",
+  "魚肉.webp",
+  "香腸.webp",
+  "烤雞.webp",
 ];
 
 export const getMenuArtworkWidth = (artwork: MenuArtwork) =>
-  artwork === "甜甜圈.svg" ? 49 : 52;
+  artwork === "甜甜圈.webp" ? 49 : 52;

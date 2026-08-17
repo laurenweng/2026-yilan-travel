@@ -27,7 +27,7 @@ const makeRewardEvent = (
   roomAssignments: [],
   menuItems: [],
   reward: {
-    artwork: "藥水.svg",
+    artwork: "藥水.webp",
     copy: "測試物品文案",
     itemId,
     name: "測試物品",

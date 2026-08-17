@@ -86,7 +86,7 @@ const parseRoomAssignments = (value?: string): RoomAssignment[] =>
         .filter(Boolean);
 
       return {
-        artwork: roomName.includes("貨櫃屋") ? "貨櫃屋.svg" : "主建築.svg",
+        artwork: roomName.includes("貨櫃屋") ? "貨櫃屋.webp" : "主建築.webp",
         details: roomDetails,
         name: roomName.trim(),
       };

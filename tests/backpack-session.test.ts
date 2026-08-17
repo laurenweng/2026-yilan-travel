@@ -15,7 +15,7 @@ const makeItem = (
   id: BackpackItemId,
   name: string,
 ): BackpackDisplayItem => ({
-  artwork: "藥水.svg",
+  artwork: "藥水.webp",
   copy: "測試物品文案",
   id,
   isNew: true,
@@ -39,7 +39,7 @@ const makeRewardEvent = (
   title: id,
   vehicles: [],
   reward: {
-    artwork: "藥水.svg",
+    artwork: "藥水.webp",
     copy: "測試物品文案",
     itemId,
     name: "測試物品",

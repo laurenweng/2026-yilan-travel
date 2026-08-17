@@ -4,7 +4,7 @@ import { applyTripScheduleRules } from "../app/lib/trip-schedule-rules.ts";
 import type { TripEvent, TripReward } from "../app/lib/trip-types.ts";
 
 const eyesReward: TripReward = {
-  artwork: "眼睛.svg",
+  artwork: "眼睛.webp",
   copy: "小旅行就是東看看西看看，獲得了宜蘭的眼界",
   itemId: "eyes",
   name: "宜蘭的眼界",

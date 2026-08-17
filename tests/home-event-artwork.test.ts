@@ -11,11 +11,11 @@ import { parseTripCsv } from "../app/lib/trip-csv.ts";
 test("行程名稱直接對應到 cards 目錄下的插圖", () => {
   assert.equal(
     getHomeEventArtwork("享用中餐"),
-    "/assets/yilan/cards/享用中餐.svg",
+    "/assets/yilan/cards/享用中餐.webp",
   );
   assert.equal(
     getHomeEventArtwork("雷射對決賽"),
-    "/assets/yilan/cards/雷射對決賽.svg",
+    "/assets/yilan/cards/雷射對決賽.webp",
   );
 });
 
@@ -23,7 +23,7 @@ test("括號註記會被正規化掉，冬山自由觀光（推薦行程）對�
   assert.equal(normalizeHomeEventArtworkName("冬山自由觀光（推薦行程）"), "冬山自由觀光");
   assert.equal(
     getHomeEventArtwork("冬山自由觀光（推薦行程）"),
-    "/assets/yilan/cards/冬山自由觀光.svg",
+    "/assets/yilan/cards/冬山自由觀光.webp",
   );
 });
 
@@ -38,7 +38,7 @@ test("採買時間刻意不放插圖，與同時段的補助推薦景點共用�
   // 同時段的另一筆仍保留插圖。
   assert.equal(
     getHomeEventArtwork("補助推薦景點"),
-    "/assets/yilan/cards/補助推薦景點.svg",
+    "/assets/yilan/cards/補助推薦景點.webp",
   );
 });
 

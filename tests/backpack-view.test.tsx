@@ -57,7 +57,7 @@ test("未解鎖背包顯示九個鎖頭", () => {
   assert.equal(lockedItems.length, 9);
   assert.equal(artworks.length, 9);
   assert.equal(
-    artworks.every((artwork) => artwork.props.src.endsWith("/鎖頭.svg")),
+    artworks.every((artwork) => artwork.props.src.endsWith("/鎖頭.webp")),
     true,
   );
 });
@@ -80,14 +80,14 @@ test("全解鎖背包依旅程取得順序顯示九格，第三格為宜蘭青�
     .map((artwork) => artwork.props.src.split("/").at(-1));
 
   assert.deepEqual(artworkSources, [
-    "藥水.svg",
-    "炸雞.svg",
-    "盾牌.svg",
-    "眼睛.svg",
-    "飲料.svg",
-    "愛心.svg",
-    "閃電.svg",
-    "星星.svg",
+    "藥水.webp",
+    "炸雞.webp",
+    "盾牌.webp",
+    "眼睛.webp",
+    "飲料.webp",
+    "愛心.webp",
+    "閃電.webp",
+    "星星.webp",
     "照片.svg",
   ]);
 });

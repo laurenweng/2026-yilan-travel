@@ -79,7 +79,7 @@ const baseBackpackItem: BackpackDisplayItem = {
 const groupPhotoBackpackItem = {
   artwork: "照片.svg",
   copy: "結束旅程，將所有旅行的回憶都放進心裡",
-  detailArtwork: "大合照.png",
+  detailArtwork: "大合照.webp",
   id: "apple",
   isNew: false,
   isUnlocked: true,
@@ -213,7 +213,7 @@ test("住宿分配顯示行程資料中的動態房間與多張床", () => {
       ...baseEvent,
       roomAssignments: [
         {
-          artwork: "主建築.svg",
+          artwork: "主建築.webp",
           details: [
             "雙人床：Linda、Lauren",
             "雙人床：Jeff、Jeff 女兒",
@@ -221,7 +221,7 @@ test("住宿分配顯示行程資料中的動態房間與多張床", () => {
           name: "主棟 - 2F A房",
         },
         {
-          artwork: "貨櫃屋.svg",
+          artwork: "貨櫃屋.webp",
           details: ["雙人床：國倫、世彥"],
           name: "貨櫃屋 - A room",
         },
@@ -311,8 +311,10 @@ test("大合照物品在 Bottom Sheet 使用寬版詳情圖片", () => {
   );
 
   assert.equal(detailArtwork.length, 1);
-  assert.equal(detailArtwork[0].props.src, "/assets/yilan/大合照.png");
+  assert.equal(detailArtwork[0].props.src, "/assets/yilan/大合照.webp");
   assert.equal(detailArtwork[0].props.alt, "大合照");
+  assert.equal(detailArtwork[0].props.width, 658);
+  assert.equal(detailArtwork[0].props.height, 456);
 });
 
 test("女生版本的大合照物品使用 g-大合照", () => {
@@ -328,7 +330,7 @@ test("女生版本的大合照物品使用 g-大合照", () => {
   );
 
   assert.equal(detailArtwork.length, 1);
-  assert.equal(detailArtwork[0].props.src, "/assets/yilan/g-大合照.png");
+  assert.equal(detailArtwork[0].props.src, "/assets/yilan/g-大合照.webp");
 });
 
 test("大合照詳情圖片維持寬版比例且不套用像素效果", () => {

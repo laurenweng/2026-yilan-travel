@@ -1,18 +1,18 @@
 export type TravelerGender = "female" | "male";
 
 export type TravelerArtworkName =
-  | "character1.svg"
-  | "character2.svg"
-  | "character3.svg"
-  | "head.svg"
-  | "大合照.png";
+  | "character1.webp"
+  | "character2.webp"
+  | "character3.webp"
+  | "head.webp"
+  | "大合照.webp";
 
 const femaleArtworkNames: Record<TravelerArtworkName, string> = {
-  "character1.svg": "g-character1.svg",
-  "character2.svg": "g-character2.svg",
-  "character3.svg": "g-character3.svg",
-  "head.svg": "g-head.svg",
-  "大合照.png": "g-大合照.png",
+  "character1.webp": "g-character1.webp",
+  "character2.webp": "g-character2.webp",
+  "character3.webp": "g-character3.webp",
+  "head.webp": "g-head.webp",
+  "大合照.webp": "g-大合照.webp",
 };
 
 export const getTravelerGenderFromSearch = (

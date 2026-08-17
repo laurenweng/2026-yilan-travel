@@ -24,7 +24,7 @@ export type TripReward = {
 };
 
 export type RoomAssignment = {
-  artwork: "主建築.svg" | "貨櫃屋.svg";
+  artwork: "主建築.webp" | "貨櫃屋.webp";
   details: string[];
   name: string;
 };

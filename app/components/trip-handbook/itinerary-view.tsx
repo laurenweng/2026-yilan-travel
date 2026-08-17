@@ -49,18 +49,18 @@ export const ItineraryView = ({
         <div aria-hidden="true" className="itinerary-scenery">
           <Image alt="" className="itinerary-tree" height={133} src="/assets/yilan/樹木.svg" unoptimized width={109} />
           <span className="itinerary-person itinerary-person-one">
-            <Image alt="" className="itinerary-person-base itinerary-person-frame" height={74} src="/assets/yilan/路人1.svg" unoptimized width={25} />
-            <Image alt="" className="itinerary-person-action itinerary-person-frame" height={74} src="/assets/yilan/路人1動作.svg" unoptimized width={25} />
+            <Image alt="" className="itinerary-person-base itinerary-person-frame" height={74} src="/assets/yilan/路人1.webp" unoptimized width={25} />
+            <Image alt="" className="itinerary-person-action itinerary-person-frame" height={74} src="/assets/yilan/路人1動作.webp" unoptimized width={25} />
           </span>
           <span className="itinerary-person itinerary-person-two">
-            <Image alt="" className="itinerary-person-base itinerary-person-frame" height={83} src="/assets/yilan/路人2.svg" unoptimized width={40} />
-            <Image alt="" className="itinerary-person-action itinerary-person-frame" height={83} src="/assets/yilan/路人2動作.svg" unoptimized width={35} />
+            <Image alt="" className="itinerary-person-base itinerary-person-frame" height={83} src="/assets/yilan/路人2.webp" unoptimized width={40} />
+            <Image alt="" className="itinerary-person-action itinerary-person-frame" height={83} src="/assets/yilan/路人2動作.webp" unoptimized width={35} />
           </span>
           <span className="itinerary-person itinerary-person-three">
-            <Image alt="" className="itinerary-person-base itinerary-person-frame" height={89} src="/assets/yilan/路人3.svg" unoptimized width={39} />
-            <Image alt="" className="itinerary-person-action itinerary-person-frame" height={89} src="/assets/yilan/路人3動作.svg" unoptimized width={44} />
+            <Image alt="" className="itinerary-person-base itinerary-person-frame" height={89} src="/assets/yilan/路人3.webp" unoptimized width={39} />
+            <Image alt="" className="itinerary-person-action itinerary-person-frame" height={89} src="/assets/yilan/路人3動作.webp" unoptimized width={44} />
           </span>
-          <Image alt="" className="itinerary-leaf" height={48} src="/assets/yilan/葉子.svg" unoptimized width={40} />
+          <Image alt="" className="itinerary-leaf" height={48} src="/assets/yilan/葉子.webp" unoptimized width={40} />
           <Image alt="" className="itinerary-tree itinerary-tree-right" height={133} src="/assets/yilan/樹木.svg" unoptimized width={109} />
         </div>
         <div className="itinerary-card-list itinerary-scroll-region">

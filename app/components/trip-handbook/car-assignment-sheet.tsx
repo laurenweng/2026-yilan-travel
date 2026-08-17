@@ -12,9 +12,9 @@ type CarAssignmentSheetProps = {
 };
 
 const vehicleArtwork: Record<"A" | "B" | "C", string> = {
-  A: "Ａ車.svg",
-  B: "Ｂ車.svg",
-  C: "計程車.svg",
+  A: "Ａ車.webp",
+  B: "Ｂ車.webp",
+  C: "計程車.webp",
 };
 
 export const CarAssignmentSheet = ({

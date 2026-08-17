@@ -626,7 +626,7 @@ test("每個名稱區塊各顯示一張對應插圖，同名同時段的行程�
   const lunchArtwork = findElementByClassName(lunchView, "home-event-artwork");
 
   assert.ok(lunchArtwork);
-  assert.equal(lunchArtwork.props.src, "/assets/yilan/cards/享用中餐.svg");
+  assert.equal(lunchArtwork.props.src, "/assets/yilan/cards/享用中餐.webp");
 
   // 三筆冬山同名同時段合併成一個名稱區塊，因此只有一張插圖。
   const dongshanView = HomeView({
@@ -640,7 +640,7 @@ test("每個名稱區塊各顯示一張對應插圖，同名同時段的行程�
   assert.equal(countElementsByClassName(dongshanView, "home-event-artwork"), 1);
   assert.equal(
     findElementByClassName(dongshanView, "home-event-artwork")?.props.src,
-    "/assets/yilan/cards/冬山自由觀光.svg",
+    "/assets/yilan/cards/冬山自由觀光.webp",
   );
 });
 
@@ -727,7 +727,7 @@ test("能量列的角色使用 head 頭像素材", () => {
   const traveler = findElementByClassName(view, "home-progress-traveler");
 
   assert.ok(traveler);
-  assert.equal(traveler.props.src, "/assets/yilan/head.svg");
+  assert.equal(traveler.props.src, "/assets/yilan/head.webp");
   assert.equal(traveler.props.width, 48);
   assert.equal(traveler.props.height, 54);
 });
@@ -744,7 +744,7 @@ test("女生版本的能量列使用 g-head 原始尺寸", () => {
   const traveler = findElementByClassName(view, "home-progress-traveler");
 
   assert.ok(traveler);
-  assert.equal(traveler.props.src, "/assets/yilan/g-head.svg");
+  assert.equal(traveler.props.src, "/assets/yilan/g-head.webp");
   assert.equal(traveler.props.width, 48);
   assert.equal(traveler.props.height, 48);
 });
@@ -762,7 +762,7 @@ test("CharacterDialogue 將女生版本傳給角色素材解析", () => {
   );
 
   assert.ok(artwork);
-  assert.equal(artwork.props.src, "/assets/yilan/g-character1.svg");
+  assert.equal(artwork.props.src, "/assets/yilan/g-character1.webp");
 });
 
 test("主視覺天空層放兩朵雲，且不干擾輔助技術與點擊", () => {

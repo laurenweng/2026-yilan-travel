@@ -32,10 +32,10 @@ export const BackpackItemSheet = ({
           <Image
             alt={item.name}
             className="backpack-item-sheet-detail-artwork"
-            height={1044}
+            height={456}
             src={`/assets/yilan/${detailArtworkName}`}
             unoptimized
-            width={1507}
+            width={658}
           />
         ) : (
           <Image

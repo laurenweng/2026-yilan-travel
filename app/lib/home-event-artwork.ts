@@ -1,5 +1,5 @@
 /**
- * 首頁卡片插圖。檔名即行程名稱，統一為 76×64 的 SVG，放在
+ * 首頁卡片插圖。檔名即行程名稱，統一為 76×64 的 WebP，放在
  * `public/assets/yilan/cards/`。
  *
  * 這裡刻意維護明確名單而非直接用行程名稱組 URL：CSV 由使用者編輯，
@@ -44,5 +44,5 @@ export const getHomeEventArtwork = (title: string) => {
   const artworkName = normalizeHomeEventArtworkName(title);
   if (!homeEventArtworkNames.has(artworkName)) return null;
 
-  return `/assets/yilan/cards/${artworkName}.svg`;
+  return `/assets/yilan/cards/${artworkName}.webp`;
 };

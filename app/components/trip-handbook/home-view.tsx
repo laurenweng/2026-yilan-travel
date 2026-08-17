@@ -27,7 +27,7 @@ type HomeViewProps = {
 const getTravelerHeadPresentation = (travelerGender: TravelerGender) => ({
   height: travelerGender === "female" ? 48 : 54,
   source: `/assets/yilan/${getTravelerArtworkName(
-    "head.svg",
+    "head.webp",
     travelerGender,
   )}`,
   width: 48,
@@ -137,13 +137,13 @@ export const HomeView = ({
     <section className="home-view">
       <header className="trip-hero">
         <div aria-hidden="true" className="trip-hero-sky">
-          <Image alt="" className="trip-hero-cloud-left" height={23} priority src="/assets/yilan/雲1.svg" unoptimized width={48} />
-          <Image alt="" className="trip-hero-cloud-right" height={28} priority src="/assets/yilan/雲2.svg" unoptimized width={49} />
+          <Image alt="" className="trip-hero-cloud-left" height={23} priority src="/assets/yilan/雲1.webp" unoptimized width={48} />
+          <Image alt="" className="trip-hero-cloud-right" height={28} priority src="/assets/yilan/雲2.webp" unoptimized width={49} />
         </div>
         <div aria-hidden="true" className="trip-hero-scene">
           <Image alt="" className="trip-hero-tree" height={133} priority src="/assets/yilan/樹木.svg" unoptimized width={109} />
-          <Image alt="" className="trip-hero-pines" height={105} priority src="/assets/yilan/松樹們.svg" unoptimized width={113} />
-          <Image alt="" className="trip-hero-bus" height={83} priority src="/assets/yilan/鴨子車.svg" unoptimized width={129} />
+          <Image alt="" className="trip-hero-pines" height={105} priority src="/assets/yilan/松樹們.webp" unoptimized width={113} />
+          <Image alt="" className="trip-hero-bus" height={83} priority src="/assets/yilan/鴨子車.webp" unoptimized width={129} />
         </div>
         <div className="trip-hero-copy">
           <h1>2026 宜蘭員旅</h1>

@@ -12,17 +12,17 @@ export type BackpackItemId =
 
 export type BackpackArtwork =
   | "照片.svg"
-  | "飲料.svg"
-  | "眼睛.svg"
-  | "愛心.svg"
-  | "星星.svg"
-  | "藥水.svg"
-  | "閃電.svg"
-  | "炸雞.svg"
-  | "青蛙.svg"
-  | "盾牌.svg";
+  | "飲料.webp"
+  | "眼睛.webp"
+  | "愛心.webp"
+  | "星星.webp"
+  | "藥水.webp"
+  | "閃電.webp"
+  | "炸雞.webp"
+  | "青蛙.webp"
+  | "盾牌.webp";
 
-export type BackpackDetailArtwork = "大合照.png";
+export type BackpackDetailArtwork = "大合照.webp";
 
 export type BackpackCatalogItem = {
   aliases?: readonly string[];
@@ -36,19 +36,19 @@ export const backpackCatalog: BackpackCatalogItem[] = [
   {
     aliases: ["蘋果"],
     artwork: "照片.svg",
-    detailArtwork: "大合照.png",
+    detailArtwork: "大合照.webp",
     id: "apple",
     name: "大合照",
   },
-  { artwork: "飲料.svg", id: "drink", name: "迎賓飲料" },
-  { artwork: "眼睛.svg", id: "eyes", name: "宜蘭的眼界" },
-  { artwork: "愛心.svg", id: "heart", name: "回憶" },
-  { artwork: "星星.svg", id: "star", name: "五星好評" },
-  { artwork: "藥水.svg", id: "potion", name: "神秘藥水" },
-  { artwork: "閃電.svg", id: "lightning", name: "療癒力量" },
-  { artwork: "炸雞.svg", id: "fried-chicken", name: "甕缸雞腿" },
-  { artwork: "青蛙.svg", id: "bomb", name: "宜蘭青蛙怪" },
-  { artwork: "盾牌.svg", id: "shield", name: "勇氣盾牌" },
+  { artwork: "飲料.webp", id: "drink", name: "迎賓飲料" },
+  { artwork: "眼睛.webp", id: "eyes", name: "宜蘭的眼界" },
+  { artwork: "愛心.webp", id: "heart", name: "回憶" },
+  { artwork: "星星.webp", id: "star", name: "五星好評" },
+  { artwork: "藥水.webp", id: "potion", name: "神秘藥水" },
+  { artwork: "閃電.webp", id: "lightning", name: "療癒力量" },
+  { artwork: "炸雞.webp", id: "fried-chicken", name: "甕缸雞腿" },
+  { artwork: "青蛙.webp", id: "bomb", name: "宜蘭青蛙怪" },
+  { artwork: "盾牌.webp", id: "shield", name: "勇氣盾牌" },
 ];
 
 export const backpackCatalogById: ReadonlyMap<BackpackItemId, BackpackCatalogItem> =
@@ -72,7 +72,7 @@ export const backpackSlots: BackpackItemId[][] = [
 ];
 
 const normalizeArtworkName = (value: string) =>
-  value.trim().replace(/\.svg$/i, "");
+  value.trim().replace(/\.(?:svg|webp)$/i, "");
 
 export const findBackpackItemByArtwork = (value?: string) => {
   const normalizedValue = value ? normalizeArtworkName(value) : "";

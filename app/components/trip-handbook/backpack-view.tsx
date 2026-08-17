@@ -30,7 +30,7 @@ export const BackpackView = ({ display, onOpenItem }: BackpackViewProps) => {
                 alt=""
                 className="backpack-item-artwork"
                 height={93}
-                src={`/assets/yilan/${item.isUnlocked ? item.artwork : "鎖頭.svg"}`}
+                src={`/assets/yilan/${item.isUnlocked ? item.artwork : "鎖頭.webp"}`}
                 unoptimized
                 width={93}
               />
@@ -70,7 +70,7 @@ export const BackpackView = ({ display, onOpenItem }: BackpackViewProps) => {
             alt=""
             className="backpack-guide"
             height={117}
-            src="/assets/yilan/鴨子.svg"
+            src="/assets/yilan/鴨子.webp"
             unoptimized
             width={91}
           />

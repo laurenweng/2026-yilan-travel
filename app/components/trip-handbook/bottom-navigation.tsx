@@ -12,11 +12,11 @@ const navigationItems: Array<{
   label: string;
   tab: NavigationTab;
 }> = [
-  { activeIcon: "首頁_active.svg", icon: "首頁.svg", label: "首頁", tab: "home" },
-  { activeIcon: "行程_active.svg", icon: "行程.svg", label: "行程", tab: "itinerary" },
+  { activeIcon: "首頁_active.webp", icon: "首頁.webp", label: "首頁", tab: "home" },
+  { activeIcon: "行程_active.webp", icon: "行程.webp", label: "行程", tab: "itinerary" },
   {
-    activeIcon: "背包_active.svg",
-    icon: "背包.svg",
+    activeIcon: "背包_active.webp",
+    icon: "背包.webp",
     label: "我的背包",
     tab: "backpack",
   },

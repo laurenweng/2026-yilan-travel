@@ -152,12 +152,12 @@ test("房間分配以換行區分房間並以分號保留同房多張床", () =>
 
   assert.deepEqual(result.events[0].roomAssignments, [
     {
-      artwork: "主建築.svg",
+      artwork: "主建築.webp",
       details: ["雙人床：Linda、Lauren", "雙人床：Jeff、Jeff 女兒"],
       name: "主棟 - 2F A房",
     },
     {
-      artwork: "貨櫃屋.svg",
+      artwork: "貨櫃屋.webp",
       details: ["雙人床：國倫、世彥"],
       name: "貨櫃屋 - A room",
     },
@@ -198,7 +198,7 @@ test("讀取行程能量與結束後解鎖的物品資料", () => {
   assert.equal(result.events[0].energy, 50);
   assert.equal(result.events[0].energyCopy, "終於抵達，見到同伴們了");
   assert.deepEqual(result.events[0].reward, {
-    artwork: "藥水.svg",
+    artwork: "藥水.webp",
     copy: "獲得來自宜蘭的神秘藥水，喝下它，就可以看見宜蘭的另類魅力！",
     itemId: "potion",
     name: "神秘藥水",
@@ -237,13 +237,13 @@ test("讀取第二個獎勵欄位，一個行程可同時綁定兩個物品", ()
 
   assert.equal(result.warnings.length, 0);
   assert.deepEqual(result.events[0].reward, {
-    artwork: "炸雞.svg",
+    artwork: "炸雞.webp",
     copy: "吃了香氣四溢的甕缸雞腿，獲得滿滿的力量，可以正式迎接今天的宜蘭之旅！",
     itemId: "fried-chicken",
     name: "甕缸雞腿",
   });
   assert.deepEqual(result.events[0].reward2, {
-    artwork: "青蛙.svg",
+    artwork: "青蛙.webp",
     copy: "一群宜蘭青蛙怪擋住了去路，呱呱！呱呱！",
     itemId: "bomb",
     name: "宜蘭青蛙怪",
@@ -639,7 +639,7 @@ test("正式 CSV 的享用中餐同時綁定甕缸雞腿與炸彈兩個獎勵", 
 
   assert.equal(eventsById.get("d1-lunch")?.reward?.itemId, "fried-chicken");
   assert.equal(eventsById.get("d1-lunch")?.reward?.name, "甕缸雞腿");
-  assert.equal(eventsById.get("d1-lunch")?.reward?.artwork, "炸雞.svg");
+  assert.equal(eventsById.get("d1-lunch")?.reward?.artwork, "炸雞.webp");
   assert.equal(eventsById.get("d1-lunch")?.reward2?.itemId, "bomb");
   assert.equal(eventsById.get("d1-laser")?.reward?.itemId, "shield");
   assert.equal(

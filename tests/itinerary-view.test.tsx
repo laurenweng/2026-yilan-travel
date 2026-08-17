@@ -350,8 +350,8 @@ test("兩天的行程卡片皆由上方排列並維持 16px 間距", () => {
 });
 
 test("菜單甜甜圈圖示顯示寬度縮小至 49px", () => {
-  assert.equal(getMenuArtworkWidth("甜甜圈.svg"), 49);
-  assert.equal(getMenuArtworkWidth("起司.svg"), 52);
+  assert.equal(getMenuArtworkWidth("甜甜圈.webp"), 49);
+  assert.equal(getMenuArtworkWidth("起司.webp"), 52);
 });
 
 test("三位路人皆載入互斥的 A、B 動作影格", () => {
