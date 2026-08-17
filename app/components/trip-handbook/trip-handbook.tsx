@@ -254,6 +254,7 @@ export const TripHandbook = () => {
         )}
         {activeTab === "itinerary" && (
           <ItineraryView
+            currentEvents={snapshot?.currentEvents ?? []}
             events={events}
             onDateChange={setSelectedItineraryDate}
             onOpenEvent={handleOpenEvent}

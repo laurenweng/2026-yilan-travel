@@ -29,6 +29,12 @@ const secondDayEvent: TripEvent = {
   title: "溫泉任務",
 };
 
+const concurrentItineraryEvent: TripEvent = {
+  ...itineraryEvent,
+  id: "farm-shop",
+  title: "農場採買",
+};
+
 const vehicleItineraryEvent: TripEvent = {
   ...itineraryEvent,
   action: {
@@ -124,8 +130,66 @@ const getTextContent = (node: ReactNode): string => {
   return getTextContent(node.props.children);
 };
 
+test("只有目前進行中的行程 title 前顯示 NOW", () => {
+  const view = ItineraryView({
+    currentEvents: [itineraryEvent],
+    events: [itineraryEvent, concurrentItineraryEvent],
+    onDateChange: () => {},
+    onOpenEvent: () => {},
+    selectedDate: "2026-08-29",
+  });
+  const badges = findElementsByClassName(view, "itinerary-now-badge");
+
+  assert.equal(badges.length, 1);
+  assert.equal(getTextContent(badges[0]), "NOW");
+});
+
+test("同時段的所有目前行程都顯示 NOW", () => {
+  const view = ItineraryView({
+    currentEvents: [itineraryEvent, concurrentItineraryEvent],
+    events: [itineraryEvent, concurrentItineraryEvent],
+    onDateChange: () => {},
+    onOpenEvent: () => {},
+    selectedDate: "2026-08-29",
+  });
+
+  assert.equal(
+    findElementsByClassName(view, "itinerary-now-badge").length,
+    2,
+  );
+});
+
+test("查看非目前日期時不顯示 NOW", () => {
+  const view = ItineraryView({
+    currentEvents: [itineraryEvent],
+    events: [itineraryEvent, secondDayEvent],
+    onDateChange: () => {},
+    onOpenEvent: () => {},
+    selectedDate: "2026-08-30",
+  });
+
+  assert.equal(findElementsByClassName(view, "itinerary-now-badge").length, 0);
+});
+
+test("NOW 使用通知紅底白字且不壓縮 title", () => {
+  const stylesheet = readFileSync(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+  const badgeRule =
+    stylesheet.match(/\.itinerary-now-badge\s*\{[^}]*\}/s)?.[0] ?? "";
+  const titleRule =
+    stylesheet.match(/\.itinerary-card-title\s*\{[^}]*\}/s)?.[0] ?? "";
+
+  assert.match(badgeRule, /background:\s*var\(--color-notification\)/);
+  assert.match(badgeRule, /color:\s*var\(--color-panel\)/);
+  assert.match(badgeRule, /flex:\s*0 0 auto/);
+  assert.match(titleRule, /display:\s*flex/);
+});
+
 test("行程卡依資料欄位顯示五行資訊", () => {
   const view = ItineraryView({
+    currentEvents: [],
     events: [itineraryEvent],
     onDateChange: () => {},
     onOpenEvent: () => {},
@@ -142,6 +206,7 @@ test("行程卡依資料欄位顯示五行資訊", () => {
 
 test("行程卡的 Map 網址可在新分頁開啟", () => {
   const view = ItineraryView({
+    currentEvents: [],
     events: [itineraryEvent],
     onDateChange: () => {},
     onOpenEvent: () => {},
@@ -158,6 +223,7 @@ test("行程卡的 Map 網址可在新分頁開啟", () => {
 
 test("日期頁籤使用第一天與第二天標籤", () => {
   const view = ItineraryView({
+    currentEvents: [],
     events: [itineraryEvent, secondDayEvent],
     onDateChange: () => {},
     onOpenEvent: () => {},
@@ -187,6 +253,7 @@ test("行程日期、卡片與操作按鈕使用確認後的字級", () => {
 
 test("切換到第二天時只顯示第二日行程", () => {
   const view = ItineraryView({
+    currentEvents: [],
     events: [itineraryEvent, secondDayEvent],
     onDateChange: () => {},
     onOpenEvent: () => {},
@@ -201,6 +268,7 @@ test("切換到第二天時只顯示第二日行程", () => {
 
 test("行程背景不渲染路線直線或編號節點", () => {
   const view = ItineraryView({
+    currentEvents: [],
     events: [itineraryEvent],
     onDateChange: () => {},
     onOpenEvent: () => {},
@@ -213,6 +281,7 @@ test("行程背景不渲染路線直線或編號節點", () => {
 
 test("行程卡片列表使用獨立捲動區", () => {
   const view = ItineraryView({
+    currentEvents: [],
     events: [itineraryEvent],
     onDateChange: () => {},
     onOpenEvent: () => {},
@@ -240,6 +309,7 @@ test("行程兩側樹木完整貼齊可視區域邊緣", () => {
 
 test("行程卡僅由操作按鈕開啟 Bottom Sheet，並保留像素邊框", () => {
   const view = ItineraryView({
+    currentEvents: [],
     events: [vehicleItineraryEvent],
     onDateChange: () => {},
     onOpenEvent: () => {},
@@ -259,6 +329,7 @@ test("行程卡僅由操作按鈕開啟 Bottom Sheet，並保留像素邊框", (
 
 test("交通行程可顯示交通建議與對應操作按鈕", () => {
   const view = ItineraryView({
+    currentEvents: [],
     events: [transportItineraryEvent],
     onDateChange: () => {},
     onOpenEvent: () => {},
@@ -356,6 +427,7 @@ test("菜單甜甜圈圖示顯示寬度縮小至 49px", () => {
 
 test("三位路人皆載入互斥的 A、B 動作影格", () => {
   const view = ItineraryView({
+    currentEvents: [],
     events: [itineraryEvent],
     onDateChange: () => {},
     onOpenEvent: () => {},
@@ -391,6 +463,7 @@ test("共同行程取消後我的行程隱藏該卡片並顯示新時間", () =>
     ),
   ).events;
   const view = ItineraryView({
+    currentEvents: [],
     events,
     onDateChange: () => {},
     onOpenEvent: () => {},

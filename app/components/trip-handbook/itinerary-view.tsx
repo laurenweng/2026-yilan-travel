@@ -8,6 +8,7 @@ import type { TripEvent } from "../../lib/trip-types";
 import { PixelFrame } from "./pixel-frame";
 
 type ItineraryViewProps = {
+  currentEvents: TripEvent[];
   events: TripEvent[];
   onDateChange: (date: ItineraryDate) => void;
   onOpenEvent: (event: TripEvent, triggerElement: HTMLElement) => void;
@@ -15,11 +16,13 @@ type ItineraryViewProps = {
 };
 
 export const ItineraryView = ({
+  currentEvents,
   events,
   onDateChange,
   onOpenEvent,
   selectedDate,
 }: ItineraryViewProps) => {
+  const currentEventIds = new Set(currentEvents.map((event) => event.id));
   const selectedDayEvents = events.filter((event) => event.date === selectedDate);
 
   return (
@@ -68,7 +71,12 @@ export const ItineraryView = ({
             <article className="itinerary-event" key={event.id}>
               <PixelFrame className="itinerary-card">
                 <div className="itinerary-card-content">
-                  <strong>{event.title}</strong>
+                  <div className="itinerary-card-title">
+                    {currentEventIds.has(event.id) && (
+                      <span className="itinerary-now-badge">NOW</span>
+                    )}
+                    <strong>{event.title}</strong>
+                  </div>
                   <span>時間｜{event.displayTime}</span>
                   {event.place && <span>地點｜{event.place}</span>}
                   {(event.address || (!event.place && event.location)) && (
