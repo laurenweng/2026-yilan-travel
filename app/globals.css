@@ -1654,7 +1654,7 @@ button:focus-visible {
 
 .car-assignment-list {
   display: grid;
-  margin: 0 32px;
+  margin: 0 32px 32px;
   width: 329px;
 }
 
@@ -1701,7 +1701,7 @@ button:focus-visible {
 .event-info-list {
   font-size: 16px;
   line-height: 1.7;
-  margin: 0 32px;
+  margin: 0 32px 32px;
 }
 
 .backpack-item-sheet-body {
@@ -1740,7 +1740,7 @@ button:focus-visible {
 
 .room-assignment-list {
   display: grid;
-  margin: 0 32px;
+  margin: 0 32px 32px;
   width: 329px;
 }
 

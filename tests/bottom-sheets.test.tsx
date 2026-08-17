@@ -132,6 +132,34 @@ test("Bottom sheet 貼齊可視畫面的左右邊緣", () => {
   assert.doesNotMatch(bottomSheetRule, /transform:/);
 });
 
+test("Bottom Sheet 的所有資訊內容與底部保持 32px 留白", () => {
+  const stylesheet = readFileSync(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+  const carAssignmentRule =
+    stylesheet.match(/\.car-assignment-list\s*\{[^}]*\}/s)?.[0] ?? "";
+  const roomAssignmentRule =
+    stylesheet.match(/\.room-assignment-list\s*\{[^}]*\}/s)?.[0] ?? "";
+  const informationRule =
+    stylesheet.match(
+      /\.bottom-sheet-placeholder,\s*\.event-info-list\s*\{[^}]*\}/s,
+    )?.[0] ?? "";
+  const backpackRule =
+    stylesheet.match(/\.backpack-item-sheet-body\s*\{[^}]*\}/s)?.[0] ?? "";
+  const bottomSheetRule =
+    stylesheet.match(/\.bottom-sheet\s*\{[^}]*\}/s)?.[0] ?? "";
+
+  assert.match(carAssignmentRule, /margin:\s*0 32px 32px/);
+  assert.match(roomAssignmentRule, /margin:\s*0 32px 32px/);
+  assert.match(informationRule, /margin:\s*0 32px 32px/);
+  assert.match(backpackRule, /margin:\s*8px 32px 32px/);
+  assert.match(
+    bottomSheetRule,
+    /padding:\s*0 0 env\(safe-area-inset-bottom\)/,
+  );
+});
+
 test("Bottom sheet 的所有說明文字統一為 16px", () => {
   const stylesheet = readFileSync(
     new URL("../app/globals.css", import.meta.url),
