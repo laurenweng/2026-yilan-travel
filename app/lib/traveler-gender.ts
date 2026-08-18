@@ -12,7 +12,7 @@ const femaleArtworkNames: Record<TravelerArtworkName, string> = {
   "new-character2.webp": "new-g-character2.webp",
   "new-character3.webp": "new-g-character3.webp",
   "head.webp": "g-head.webp",
-  "new-大合照.webp": "new-大合照.webp",
+  "new-大合照.webp": "new-g-大合照.webp",
 };
 
 export const getTravelerGenderFromSearch = (

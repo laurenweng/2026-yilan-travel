@@ -359,7 +359,7 @@ test("大合照物品在 Bottom Sheet 使用寬版詳情圖片", () => {
   assert.equal(detailArtwork[0].props.height, 456);
 });
 
-test("女生版本的大合照物品共用新版大合照", () => {
+test("女生版本的大合照物品使用新版女生合照", () => {
   const element = BackpackItemSheet({
     item: groupPhotoBackpackItem,
     onClose: () => {},
@@ -372,7 +372,7 @@ test("女生版本的大合照物品共用新版大合照", () => {
   );
 
   assert.equal(detailArtwork.length, 1);
-  assert.equal(detailArtwork[0].props.src, "/assets/yilan/new-大合照.webp");
+  assert.equal(detailArtwork[0].props.src, "/assets/yilan/new-g-大合照.webp");
 });
 
 test("大合照詳情圖片維持寬版比例且不套用像素效果", () => {

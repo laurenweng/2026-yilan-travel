@@ -36,13 +36,13 @@ test("缺省或不符合的 gender 回退至男生小旅人", () => {
   }
 });
 
-test("女生模式切換新版人物素材，並共用新版大合照", () => {
+test("女生模式切換新版人物與女生合照素材", () => {
   const artworkPairs: Array<[TravelerArtworkName, string]> = [
     ["new-character1.webp", "new-g-character1.webp"],
     ["new-character2.webp", "new-g-character2.webp"],
     ["new-character3.webp", "new-g-character3.webp"],
     ["head.webp", "g-head.webp"],
-    ["new-大合照.webp", "new-大合照.webp"],
+    ["new-大合照.webp", "new-g-大合照.webp"],
   ];
 
   for (const [maleArtworkName, femaleArtworkName] of artworkPairs) {
@@ -66,6 +66,7 @@ test("新版人物與大合照皆為輕量 WebP 素材", () => {
     "new-g-character2.webp",
     "new-g-character3.webp",
     "new-大合照.webp",
+    "new-g-大合照.webp",
   ];
 
   artworkNames.forEach((artworkName) => {
