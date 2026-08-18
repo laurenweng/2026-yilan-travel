@@ -7,6 +7,7 @@ import {
 } from "../../lib/traveler-gender";
 import type { TripEvent, TripPhase, TripSnapshot } from "../../lib/trip-types";
 import { resolveHomeDialogue } from "../../lib/home-dialogue";
+import { getTripEventStartTimestamp } from "../../lib/trip-time";
 import { CharacterDialogue } from "./character-dialogue";
 import { EnergyBar } from "./energy-bar";
 import { PixelFrame } from "./pixel-frame";
@@ -15,6 +16,7 @@ import { PretripChecklist } from "./pretrip-checklist";
 type LoadState = "loading" | "ready" | "error";
 
 type HomeViewProps = {
+  currentTime?: Date;
   events: TripEvent[];
   loadState: LoadState;
   onOpenVehicle?: (event: TripEvent, triggerElement: HTMLElement) => void;
@@ -22,6 +24,31 @@ type HomeViewProps = {
   snapshot: TripSnapshot | null;
   travelerGender?: TravelerGender;
   warningCount: number;
+};
+
+const morningPreparationCopy =
+  "先洗臉刷牙、整理一下，稍微休息，準備等等一起吃早餐吧～";
+
+const isMorningPreparationTime = (
+  currentTime: Date | undefined,
+  snapshot: TripSnapshot | null,
+) => {
+  if (!currentTime || snapshot?.phase !== "resting" || !snapshot.nextEvent) {
+    return false;
+  }
+
+  const breakfastEvent = snapshot.nextEvent;
+  if (!breakfastEvent.title.includes("早餐")) return false;
+
+  const preparationStartTimestamp = Date.parse(
+    `${breakfastEvent.date}T06:00:00+08:00`,
+  );
+  const currentTimestamp = currentTime.getTime();
+
+  return (
+    preparationStartTimestamp <= currentTimestamp &&
+    currentTimestamp < getTripEventStartTimestamp(breakfastEvent)
+  );
 };
 
 const getTravelerHeadPresentation = (travelerGender: TravelerGender) => ({
@@ -108,6 +135,7 @@ const HomeEventCard = ({
 };
 
 export const HomeView = ({
+  currentTime,
   events,
   loadState,
   onOpenVehicle,
@@ -132,6 +160,7 @@ export const HomeView = ({
     ? resolveHomeDialogue(events, snapshot)
     : undefined;
   const travelerHeadPresentation = getTravelerHeadPresentation(travelerGender);
+  const isMorningPreparation = isMorningPreparationTime(currentTime, snapshot);
 
   return (
     <section className="home-view">
@@ -226,16 +255,29 @@ export const HomeView = ({
           <>
             <div className="home-status-card phase-resting pixel-frame">
               <div className="home-status-card-content">
-                <span className="event-status-label">休息中</span>
-                <strong>今晚好好休息</strong>
+                <span className="event-status-label">
+                  {isMorningPreparation ? "晨間準備中" : "休息中"}
+                </span>
+                <strong>
+                  {isMorningPreparation ? "早安！起床準備" : "今晚好好休息"}
+                </strong>
                 {snapshot.nextEvent && (
                   <span>
-                    明日 {snapshot.nextEvent.startTime}　{snapshot.nextEvent.title}
+                    {!isMorningPreparation && "明日 "}
+                    {snapshot.nextEvent.startTime}　{snapshot.nextEvent.title}
                   </span>
                 )}
               </div>
             </div>
-            {dialogue && (
+            {isMorningPreparation ? (
+              <CharacterDialogue
+                character="duck"
+                className="duck-dialogue resting-dialogue"
+                travelerGender={travelerGender}
+              >
+                {morningPreparationCopy}
+              </CharacterDialogue>
+            ) : dialogue ? (
               <CharacterDialogue
                 character={dialogue.character}
                 className="duck-dialogue resting-dialogue"
@@ -243,7 +285,7 @@ export const HomeView = ({
               >
                 {dialogue.copy}
               </CharacterDialogue>
-            )}
+            ) : null}
           </>
         )}
 

@@ -462,6 +462,55 @@ test("跨日休息顯示明日行程與休息台詞，但不顯示能量列", ()
   assert.doesNotMatch(collectText(view), /體力大透支/);
 });
 
+test("早餐日從 06:00 起在首頁顯示晨間準備提醒，且早餐開始時停止", () => {
+  const nightMarketEvent: TripEvent = {
+    ...makeEvent("d1-night-market", "羅東夜市", "羅東夜市"),
+    endTime: "23:00",
+    startTime: "21:30",
+  };
+  const breakfastEvent: TripEvent = {
+    ...makeEvent("d2-breakfast", "早餐時間", "民宿"),
+    date: "2026-08-30",
+    displayTime: "09:00 - 10:30",
+    startTime: "09:00",
+    endTime: "10:30",
+  };
+  const events = [nightMarketEvent, breakfastEvent];
+  const cases = [
+    {
+      expectedCopy: "今晚好好休息",
+      expectedStatus: "休息中",
+      now: new Date("2026-08-30T05:59:59+08:00"),
+    },
+    {
+      expectedCopy:
+        "先洗臉刷牙、整理一下，稍微休息，準備等等一起吃早餐吧～",
+      expectedStatus: "晨間準備中",
+      now: new Date("2026-08-30T06:00:00+08:00"),
+    },
+    {
+      expectedCopy: "早餐時間",
+      expectedStatus: "現在進行中",
+      now: new Date("2026-08-30T09:00:00+08:00"),
+    },
+  ];
+
+  cases.forEach(({ expectedCopy, expectedStatus, now }) => {
+    const view = HomeView({
+      currentTime: now,
+      events,
+      loadState: "ready",
+      onRefresh: () => {},
+      snapshot: resolveTripSnapshot(events, now),
+      warningCount: 0,
+    });
+    const renderedText = collectText(view);
+
+    assert.match(renderedText, new RegExp(expectedStatus));
+    assert.match(renderedText, new RegExp(expectedCopy));
+  });
+});
+
 test("每種行程階段的角色對話區都只渲染一個角色", () => {
   const preTripEvent: TripEvent = {
     ...activeEvent,

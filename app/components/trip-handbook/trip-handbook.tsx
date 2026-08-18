@@ -243,6 +243,7 @@ export const TripHandbook = () => {
       <div className="trip-app-content">
         {activeTab === "home" && (
           <HomeView
+            currentTime={effectiveTime}
             events={events}
             loadState={loadState}
             onOpenVehicle={handleOpenEvent}
