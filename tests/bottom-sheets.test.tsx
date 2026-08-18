@@ -79,7 +79,7 @@ const baseBackpackItem: BackpackDisplayItem = {
 const groupPhotoBackpackItem = {
   artwork: "照片.svg",
   copy: "結束旅程，將所有旅行的回憶都放進心裡",
-  detailArtwork: "大合照.webp",
+  detailArtwork: "new-大合照.webp",
   id: "apple",
   isNew: false,
   isUnlocked: true,
@@ -130,6 +130,20 @@ test("Bottom sheet 貼齊可視畫面的左右邊緣", () => {
   assert.match(bottomSheetRule, /width:\s*100%/);
   assert.doesNotMatch(bottomSheetRule, /max-width:/);
   assert.doesNotMatch(bottomSheetRule, /transform:/);
+});
+
+test("Bottom Sheet 進場動畫只沿垂直方向由下往上", () => {
+  const stylesheet = readFileSync(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+  const sheetEnterKeyframes = stylesheet.match(
+    /@keyframes sheet-enter\s*\{[\s\S]*?\n\}/,
+  )?.[0] ?? "";
+
+  assert.match(sheetEnterKeyframes, /from\s*\{[^}]*translateY\(100%\)/s);
+  assert.match(sheetEnterKeyframes, /to\s*\{[^}]*translateY\(0\)/s);
+  assert.doesNotMatch(sheetEnterKeyframes, /translateX|translate\(/);
 });
 
 test("Bottom Sheet 的所有資訊內容與底部保持 32px 留白", () => {
@@ -339,13 +353,13 @@ test("大合照物品在 Bottom Sheet 使用寬版詳情圖片", () => {
   );
 
   assert.equal(detailArtwork.length, 1);
-  assert.equal(detailArtwork[0].props.src, "/assets/yilan/大合照.webp");
+  assert.equal(detailArtwork[0].props.src, "/assets/yilan/new-大合照.webp");
   assert.equal(detailArtwork[0].props.alt, "大合照");
   assert.equal(detailArtwork[0].props.width, 658);
   assert.equal(detailArtwork[0].props.height, 456);
 });
 
-test("女生版本的大合照物品使用 g-大合照", () => {
+test("女生版本的大合照物品共用新版大合照", () => {
   const element = BackpackItemSheet({
     item: groupPhotoBackpackItem,
     onClose: () => {},
@@ -358,7 +372,7 @@ test("女生版本的大合照物品使用 g-大合照", () => {
   );
 
   assert.equal(detailArtwork.length, 1);
-  assert.equal(detailArtwork[0].props.src, "/assets/yilan/g-大合照.webp");
+  assert.equal(detailArtwork[0].props.src, "/assets/yilan/new-大合照.webp");
 });
 
 test("大合照詳情圖片維持寬版比例且不套用像素效果", () => {

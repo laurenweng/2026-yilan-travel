@@ -481,7 +481,7 @@ button:focus-visible {
 }
 
 .character-dialogue-artwork {
-  image-rendering: pixelated;
+  image-rendering: auto;
   position: absolute;
   right: 0;
   z-index: 3;
@@ -822,6 +822,7 @@ button:focus-visible {
 
 .home-event-card.phase-active,
 .home-event-card.phase-en_route,
+.home-status-card.phase-resting,
 .home-status-card.phase-trip_complete {
   background: transparent;
   isolation: isolate;
@@ -829,8 +830,10 @@ button:focus-visible {
 }
 
 .home-event-card.phase-en_route::before,
+.home-status-card.phase-resting::before,
 .home-status-card.phase-trip_complete::before,
 .home-event-card.phase-en_route::after,
+.home-status-card.phase-resting::after,
 .home-status-card.phase-trip_complete::after {
   clip-path: var(--pixel-card-corners);
   content: "";
@@ -839,6 +842,7 @@ button:focus-visible {
 }
 
 .home-event-card.phase-en_route::before,
+.home-status-card.phase-resting::before,
 .home-status-card.phase-trip_complete::before {
   background: rgb(104 82 78 / 32%);
   inset: 4px -4px -4px 4px;
@@ -846,6 +850,7 @@ button:focus-visible {
 }
 
 .home-event-card.phase-en_route::after,
+.home-status-card.phase-resting::after,
 .home-status-card.phase-trip_complete::after {
   background: var(--color-ink);
   inset: 0;
@@ -971,7 +976,8 @@ button:focus-visible {
   color: #fff;
 }
 
-.home-event-card.phase-en_route .event-status-label {
+.home-event-card.phase-en_route .event-status-label,
+.home-status-card.phase-resting .event-status-label {
   background: #fff5d4;
   color: var(--color-ink);
 }
@@ -1017,6 +1023,7 @@ button:focus-visible {
   font-size: 13px;
 }
 
+.home-status-card.phase-resting .home-status-card-content,
 .home-status-card.phase-trip_complete .home-status-card-content {
   color: #fff;
   z-index: 2;
@@ -1472,6 +1479,7 @@ button:focus-visible {
 
 .backpack-content {
   align-items: center;
+  align-self: center;
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -1804,11 +1812,11 @@ button:focus-visible {
 
 @keyframes sheet-enter {
   from {
-    transform: translate(-50%, 100%);
+    transform: translateY(100%);
   }
 
   to {
-    transform: translate(-50%, 0);
+    transform: translateY(0);
   }
 }
 
@@ -1828,6 +1836,16 @@ button:focus-visible {
 }
 
 @media (min-width: 520px) {
+  .pretrip-dialogue {
+    align-self: center;
+    margin-left: 0;
+  }
+
+  .duck-dialogue {
+    align-self: center;
+    margin-left: 80px;
+  }
+
   .trip-app-shell {
     box-shadow: 0 0 40px rgb(60 60 60 / 18%);
   }

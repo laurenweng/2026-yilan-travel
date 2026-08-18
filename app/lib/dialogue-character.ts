@@ -17,21 +17,21 @@ export type DialogueCharacter =
 const dialogueCharacterPresentations = {
   /** 揮手打招呼，用於行前狀態。 */
   travelerWaving: {
-    height: 191,
-    source: "/assets/yilan/character1.webp",
-    width: 101,
+    height: 210,
+    source: "/assets/yilan/new-character1.webp",
+    width: 111,
   },
   /** 攤開地圖，用於旅程完成。 */
   travelerWithMap: {
-    height: 197,
-    source: "/assets/yilan/character3.webp",
-    width: 102,
+    height: 217,
+    source: "/assets/yilan/new-character3.webp",
+    width: 112,
   },
   /** 驚慌護著背包，用於警告類行程（如雷射對決賽）。 */
   travelerWarning: {
-    height: 198,
-    source: "/assets/yilan/character2.webp",
-    width: 100,
+    height: 218,
+    source: "/assets/yilan/new-character2.webp",
+    width: 110,
   },
   duck: {
     height: 117,
@@ -44,9 +44,9 @@ const travelerArtworkNames: Record<
   Exclude<DialogueCharacter, "duck">,
   TravelerArtworkName
 > = {
-  travelerWaving: "character1.webp",
-  travelerWithMap: "character3.webp",
-  travelerWarning: "character2.webp",
+  travelerWaving: "new-character1.webp",
+  travelerWithMap: "new-character3.webp",
+  travelerWarning: "new-character2.webp",
 };
 
 export const getDialogueCharacterPresentation = (

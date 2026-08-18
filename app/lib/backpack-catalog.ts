@@ -22,7 +22,7 @@ export type BackpackArtwork =
   | "青蛙.webp"
   | "盾牌.webp";
 
-export type BackpackDetailArtwork = "大合照.webp";
+export type BackpackDetailArtwork = "new-大合照.webp";
 
 export type BackpackCatalogItem = {
   aliases?: readonly string[];
@@ -36,7 +36,7 @@ export const backpackCatalog: BackpackCatalogItem[] = [
   {
     aliases: ["蘋果"],
     artwork: "照片.svg",
-    detailArtwork: "大合照.webp",
+    detailArtwork: "new-大合照.webp",
     id: "apple",
     name: "大合照",
   },

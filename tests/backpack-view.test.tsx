@@ -269,6 +269,18 @@ test("背包九格維持 93px 三欄與 24px 間距", () => {
   assert.match(backpackGridRule, /gap:\s*24px/);
 });
 
+test("背包內容欄在寬螢幕維持置中", () => {
+  const stylesheet = readFileSync(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+  const backpackContentRule = stylesheet.match(
+    /\.backpack-content\s*\{[^}]*\}/s,
+  )?.[0] ?? "";
+
+  assert.match(backpackContentRule, /align-self:\s*center/);
+});
+
 test("背包物品格使用 93px 深色像素框與右下陰影", () => {
   const stylesheet = readFileSync(
     new URL("../app/globals.css", import.meta.url),

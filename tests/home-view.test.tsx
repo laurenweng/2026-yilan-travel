@@ -460,6 +460,11 @@ test("跨日休息顯示明日行程與休息台詞，但不顯示能量列", ()
   assert.equal(findElementByClassName(view, "energy-bar"), null);
   assert.equal(findElementByClassName(view, "home-progress-status"), null);
   assert.doesNotMatch(collectText(view), /體力大透支/);
+
+  const restingCard = findElementByClassName(view, "home-status-card");
+  assert.ok(restingCard);
+  assert.match(restingCard.props.className, /phase-resting/);
+  assert.doesNotMatch(restingCard.props.className, /pixel-frame/);
 });
 
 test("早餐日從 06:00 起在首頁顯示晨間準備提醒，且早餐開始時停止", () => {
@@ -811,7 +816,7 @@ test("CharacterDialogue 將女生版本傳給角色素材解析", () => {
   );
 
   assert.ok(artwork);
-  assert.equal(artwork.props.src, "/assets/yilan/g-character1.webp");
+  assert.equal(artwork.props.src, "/assets/yilan/new-g-character1.webp");
 });
 
 test("主視覺天空層放兩朵雲，且不干擾輔助技術與點擊", () => {
@@ -962,6 +967,33 @@ test("主要卡片會在窄螢幕收窄，導覽與文字維持原始尺寸", ()
   assert.doesNotMatch(navigationRule, /max-width:\s*var\(--content-width\)/);
   assert.match(navigationRule, /left:\s*0/);
   assert.doesNotMatch(titleRule, /scale\(/);
+});
+
+test("寬螢幕首頁人物對話以中央內容欄為定位基準", () => {
+  const stylesheet = readFileSync(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+  const wideScreenRule = stylesheet.match(
+    /@media \(min-width: 520px\)\s*\{[\s\S]*?\.duck-dialogue\s*\{[^}]*\}/,
+  )?.[0] ?? "";
+
+  assert.match(wideScreenRule, /\.pretrip-dialogue\s*\{[^}]*align-self:\s*center/s);
+  assert.match(wideScreenRule, /\.pretrip-dialogue\s*\{[^}]*margin-left:\s*0/s);
+  assert.match(wideScreenRule, /align-self:\s*center/);
+  assert.match(wideScreenRule, /margin-left:\s*80px/);
+});
+
+test("首頁小旅人使用平滑縮放，不強制套用像素化效果", () => {
+  const stylesheet = readFileSync(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+  const characterArtworkRule =
+    stylesheet.match(/\.character-dialogue-artwork\s*\{[^}]*\}/s)?.[0] ?? "";
+
+  assert.match(characterArtworkRule, /image-rendering:\s*auto/);
+  assert.doesNotMatch(characterArtworkRule, /image-rendering:\s*pixelated/);
 });
 
 test("共同行程取消後首頁使用新時間且不顯示共同行程", () => {

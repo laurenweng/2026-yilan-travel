@@ -253,7 +253,7 @@ export const HomeView = ({
 
         {loadState === "ready" && snapshot?.phase === "resting" && (
           <>
-            <div className="home-status-card phase-resting pixel-frame">
+            <div className="home-status-card phase-resting">
               <div className="home-status-card-content">
                 <span className="event-status-label">
                   {isMorningPreparation ? "晨間準備中" : "休息中"}
