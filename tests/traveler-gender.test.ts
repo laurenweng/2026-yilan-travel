@@ -94,3 +94,14 @@ test("新版小旅人 WebP 提供三倍顯示尺寸給 Retina 螢幕", () => {
     assert.deepEqual(readLosslessWebpSize(artworkName), expectedSize);
   });
 });
+
+test("男女能量列頭像 WebP 提供三倍顯示尺寸給 Retina 螢幕", () => {
+  assert.deepEqual(readLosslessWebpSize("head.webp"), {
+    height: 162,
+    width: 144,
+  });
+  assert.deepEqual(readLosslessWebpSize("g-head.webp"), {
+    height: 144,
+    width: 144,
+  });
+});

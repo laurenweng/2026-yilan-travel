@@ -1,9 +1,25 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
   getDialogueCharacterPresentation,
   type DialogueCharacter,
 } from "../app/lib/dialogue-character.ts";
+
+const readLosslessWebpSize = (artworkName: string) => {
+  const artwork = readFileSync(
+    new URL(`../public/assets/yilan/${artworkName}`, import.meta.url),
+  );
+
+  assert.equal(artwork.subarray(12, 16).toString(), "VP8L");
+
+  const dimensionBits = artwork.readUInt32LE(21);
+
+  return {
+    height: ((dimensionBits >>> 14) & 0x3fff) + 1,
+    width: (dimensionBits & 0x3fff) + 1,
+  };
+};
 
 test("行前對話使用揮手打招呼的小旅人", () => {
   assert.deepEqual(getDialogueCharacterPresentation("travelerWaving"), {
@@ -26,6 +42,13 @@ test("旅途中對話使用獨立鴨子素材", () => {
     height: 117,
     source: "/assets/yilan/鴨子.webp",
     width: 91,
+  });
+});
+
+test("鴨子 WebP 提供三倍顯示尺寸給 Retina 螢幕", () => {
+  assert.deepEqual(readLosslessWebpSize("鴨子.webp"), {
+    height: 351,
+    width: 273,
   });
 });
 
