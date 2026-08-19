@@ -3,6 +3,45 @@ import type {
   BackpackDisplay,
   BackpackDisplayItem,
 } from "../../lib/backpack-state";
+import {
+  getTravelerArtworkName,
+  type TravelerGender,
+} from "../../lib/traveler-gender";
+
+type BackpackArtworkPreloadsProps = {
+  display: BackpackDisplay;
+  travelerGender: TravelerGender;
+};
+
+export const BackpackArtworkPreloads = ({
+  display,
+  travelerGender,
+}: BackpackArtworkPreloadsProps) => {
+  const artworkSources = display.items.map(
+    (item) =>
+      `/assets/yilan/${item.isUnlocked ? item.artwork : "鎖頭.webp"}`,
+  );
+  artworkSources.push("/assets/yilan/鴨子.webp");
+
+  display.items.forEach((item) => {
+    if (!item.isUnlocked || !item.detailArtwork) return;
+
+    artworkSources.push(
+      `/assets/yilan/${getTravelerArtworkName(
+        item.detailArtwork,
+        travelerGender,
+      )}`,
+    );
+  });
+
+  return (
+    <>
+      {[...new Set(artworkSources)].map((artworkSource) => (
+        <link as="image" href={artworkSource} key={artworkSource} rel="preload" />
+      ))}
+    </>
+  );
+};
 
 type BackpackViewProps = {
   display: BackpackDisplay;
@@ -30,6 +69,7 @@ export const BackpackView = ({ display, onOpenItem }: BackpackViewProps) => {
                 alt=""
                 className="backpack-item-artwork"
                 height={93}
+                loading="eager"
                 src={`/assets/yilan/${item.isUnlocked ? item.artwork : "鎖頭.webp"}`}
                 unoptimized
                 width={93}
@@ -70,6 +110,7 @@ export const BackpackView = ({ display, onOpenItem }: BackpackViewProps) => {
             alt=""
             className="backpack-guide"
             height={117}
+            loading="eager"
             src="/assets/yilan/鴨子.webp"
             unoptimized
             width={91}

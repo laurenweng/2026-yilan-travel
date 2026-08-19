@@ -2,9 +2,19 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { isValidElement, type ReactElement, type ReactNode } from "react";
-import { BackpackView } from "../app/components/trip-handbook/backpack-view";
+import * as backpackViewModule from "../app/components/trip-handbook/backpack-view";
 import { BottomNavigation } from "../app/components/trip-handbook/bottom-navigation";
 import { getBackpackDisplay } from "../app/lib/backpack-state";
+
+const { BackpackView } = backpackViewModule;
+const BackpackArtworkPreloads = (
+  backpackViewModule as typeof backpackViewModule & {
+    BackpackArtworkPreloads?: (props: {
+      display: ReturnType<typeof getBackpackDisplay>;
+      travelerGender: "female" | "male";
+    }) => ReactNode;
+  }
+).BackpackArtworkPreloads;
 
 const findElementsByClassName = (
   node: ReactNode,
@@ -49,6 +59,32 @@ const getTextContent = (node: ReactNode): string => {
   return getTextContent(node.props.children);
 };
 
+const findElementsByType = (
+  node: ReactNode,
+  elementType: string,
+): ReactElement[] => {
+  if (Array.isArray(node)) {
+    return node.flatMap((child) => findElementsByType(child, elementType));
+  }
+
+  if (!isValidElement<{ children?: ReactNode }>(node)) return [];
+
+  const matches = node.type === elementType ? [node] : [];
+
+  if (typeof node.type === "function") {
+    const Component = node.type;
+    return [
+      ...matches,
+      ...findElementsByType(Component(node.props), elementType),
+    ];
+  }
+
+  return [
+    ...matches,
+    ...findElementsByType(node.props.children, elementType),
+  ];
+};
+
 test("未解鎖背包顯示九個鎖頭", () => {
   const view = BackpackView({ display: getBackpackDisplay("locked") });
   const lockedItems = findElementsByClassName(view, "backpack-item-locked");
@@ -60,6 +96,68 @@ test("未解鎖背包顯示九個鎖頭", () => {
     artworks.every((artwork) => artwork.props.src.endsWith("/鎖頭.webp")),
     true,
   );
+});
+
+test("背包圖片在切頁後立即載入，不再等待 lazy loading", () => {
+  const view = BackpackView({ display: getBackpackDisplay("locked") });
+  const artworks = findElementsByClassName(view, "backpack-item-artwork");
+  const guide = findElementsByClassName(view, "backpack-guide");
+
+  assert.equal(artworks.length, 9);
+  assert.equal(guide.length, 1);
+  assert.equal(
+    [...artworks, ...guide].every(
+      (imageElement) => imageElement.props.loading === "eager",
+    ),
+    true,
+  );
+});
+
+test("未解鎖背包只預載一張鎖頭與鴨子，不重複九次", () => {
+  assert.ok(BackpackArtworkPreloads);
+  const preloads = BackpackArtworkPreloads({
+    display: getBackpackDisplay("locked"),
+    travelerGender: "male",
+  });
+  const preloadLinks = findElementsByType(preloads, "link");
+
+  assert.deepEqual(
+    preloadLinks.map((preloadLink) => preloadLink.props.href),
+    ["/assets/yilan/鎖頭.webp", "/assets/yilan/鴨子.webp"],
+  );
+  assert.equal(
+    preloadLinks.every(
+      (preloadLink) =>
+        preloadLink.props.as === "image" &&
+        preloadLink.props.rel === "preload",
+    ),
+    true,
+  );
+});
+
+test("全解鎖時預載九格、鴨子與目前性別的大合照", () => {
+  assert.ok(BackpackArtworkPreloads);
+  const preloads = BackpackArtworkPreloads({
+    display: getBackpackDisplay("all"),
+    travelerGender: "female",
+  });
+  const preloadSources = findElementsByType(preloads, "link").map(
+    (preloadLink) => preloadLink.props.href,
+  );
+
+  assert.deepEqual(preloadSources, [
+    "/assets/yilan/藥水.webp",
+    "/assets/yilan/炸雞.webp",
+    "/assets/yilan/盾牌.webp",
+    "/assets/yilan/眼睛.webp",
+    "/assets/yilan/飲料.webp",
+    "/assets/yilan/愛心.webp",
+    "/assets/yilan/閃電.webp",
+    "/assets/yilan/星星.webp",
+    "/assets/yilan/照片.svg",
+    "/assets/yilan/鴨子.webp",
+    "/assets/yilan/new-g-大合照.webp",
+  ]);
 });
 
 test("新物品背包顯示兩個收藏與一個 New", () => {

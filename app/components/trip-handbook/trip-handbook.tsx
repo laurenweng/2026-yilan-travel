@@ -38,7 +38,10 @@ import {
 } from "../../lib/traveler-gender";
 import type { TripDataWarning, TripEvent } from "../../lib/trip-types";
 import { BackpackItemSheet } from "./backpack-item-sheet";
-import { BackpackView } from "./backpack-view";
+import {
+  BackpackArtworkPreloads,
+  BackpackView,
+} from "./backpack-view";
 import { BottomNavigation, type NavigationTab } from "./bottom-navigation";
 import { CarAssignmentSheet } from "./car-assignment-sheet";
 import { EventInfoSheet } from "./event-info-sheet";
@@ -240,6 +243,10 @@ export const TripHandbook = () => {
 
   return (
     <main className="trip-app-shell">
+      <BackpackArtworkPreloads
+        display={backpackDisplay}
+        travelerGender={travelerGender}
+      />
       <div className="trip-app-content">
         {activeTab === "home" && (
           <HomeView
