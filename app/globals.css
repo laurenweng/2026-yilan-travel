@@ -166,6 +166,65 @@ button:focus-visible {
   padding-bottom: 0;
 }
 
+.initial-loading-screen {
+  align-items: center;
+  background: var(--color-brand);
+  display: flex;
+  height: 100dvh;
+  justify-content: center;
+  width: 100%;
+}
+
+.initial-loading-content {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  margin-top: 12px;
+}
+
+.initial-loading-artwork {
+  height: 60px;
+  image-rendering: pixelated;
+  width: 60px;
+}
+
+.initial-loading-label {
+  color: var(--color-ink);
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 8px 0 0;
+}
+
+.initial-loading-dots {
+  animation: initial-loading-dots 1.2s steps(1, end) infinite;
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  width: 1ch;
+}
+
+@keyframes initial-loading-dots {
+  0%,
+  24% {
+    width: 1ch;
+  }
+
+  25%,
+  49% {
+    width: 2ch;
+  }
+
+  50%,
+  74% {
+    width: 3ch;
+  }
+
+  75%,
+  100% {
+    width: 1ch;
+  }
+}
+
 .trip-hero {
   background: var(--color-brand);
   height: 240px;

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import {
   useCallback,
   useEffect,
@@ -30,6 +31,7 @@ import {
   getInitialItineraryDate,
   type ItineraryDate,
 } from "../../lib/itinerary-date";
+import { waitForInitialLoading } from "../../lib/initial-loading";
 import { loadTripEventsWithFallback } from "../../lib/trip-csv";
 import { resolveTripSnapshot } from "../../lib/trip-time";
 import {
@@ -128,6 +130,7 @@ export const TripHandbook = () => {
       );
       setEvents(result.events);
       setWarnings(result.warnings);
+      await waitForInitialLoading();
       setLoadState("ready");
     } catch {
       setLoadState("error");
@@ -147,6 +150,8 @@ export const TripHandbook = () => {
 
         setEvents(result.events);
         setWarnings(result.warnings);
+        await waitForInitialLoading();
+        if (isCancelled) return;
         setLoadState("ready");
       } catch {
         if (!isCancelled) setLoadState("error");
@@ -240,6 +245,30 @@ export const TripHandbook = () => {
   );
 
   const handleCloseSheet = useCallback(() => setSelectedEvent(null), []);
+
+  if (loadState === "loading") {
+    return (
+      <main className="initial-loading-screen">
+        <section aria-label="網站載入中" className="initial-loading-content">
+          <Image
+            alt=""
+            className="initial-loading-artwork"
+            height={60}
+            priority
+            src="/assets/yilan/背包_active.webp"
+            unoptimized
+            width={60}
+          />
+          <p aria-live="polite" className="initial-loading-label">
+            Loading
+            <span aria-hidden="true" className="initial-loading-dots">
+              ...
+            </span>
+          </p>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main className="trip-app-shell">
