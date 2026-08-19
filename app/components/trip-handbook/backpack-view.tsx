@@ -43,6 +43,27 @@ export const BackpackArtworkPreloads = ({
   );
 };
 
+const sheetArtworkSources = [
+  "/assets/yilan/Ａ車.webp",
+  "/assets/yilan/Ｂ車.webp",
+  "/assets/yilan/計程車.webp",
+  "/assets/yilan/甜甜圈.webp",
+  "/assets/yilan/起司.webp",
+  "/assets/yilan/魚肉.webp",
+  "/assets/yilan/香腸.webp",
+  "/assets/yilan/烤雞.webp",
+];
+
+export const SheetArtworkPreloads = () => {
+  return (
+    <>
+      {sheetArtworkSources.map((artworkSource) => (
+        <link as="image" href={artworkSource} key={artworkSource} rel="preload" />
+      ))}
+    </>
+  );
+};
+
 type BackpackViewProps = {
   display: BackpackDisplay;
   onOpenItem?: (

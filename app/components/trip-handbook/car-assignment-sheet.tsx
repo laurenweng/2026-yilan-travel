@@ -34,6 +34,7 @@ export const CarAssignmentSheet = ({
               alt=""
               className="car-assignment-icon"
               height={43}
+              loading="eager"
               src={`/assets/yilan/${vehicleArtwork[assignment.vehicle]}`}
               unoptimized
               width={89}

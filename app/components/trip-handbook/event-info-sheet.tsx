@@ -91,6 +91,7 @@ export const EventInfoSheet = ({
                 className="menu-artwork-icon"
                 height={45}
                 key={artwork}
+                loading="eager"
                 src={`/assets/yilan/${artwork}`}
                 unoptimized
                 width={getMenuArtworkWidth(artwork)}

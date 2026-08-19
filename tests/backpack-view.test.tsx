@@ -15,6 +15,11 @@ const BackpackArtworkPreloads = (
     }) => ReactNode;
   }
 ).BackpackArtworkPreloads;
+const SheetArtworkPreloads = (
+  backpackViewModule as typeof backpackViewModule & {
+    SheetArtworkPreloads?: () => ReactNode;
+  }
+).SheetArtworkPreloads;
 
 const findElementsByClassName = (
   node: ReactNode,
@@ -133,6 +138,24 @@ test("未解鎖背包只預載一張鎖頭與鴨子，不重複九次", () => {
     ),
     true,
   );
+});
+
+test("進站時預載車輛與菜單 Bottom Sheet 的固定圖片", () => {
+  assert.ok(SheetArtworkPreloads);
+  const preloadSources = findElementsByType(SheetArtworkPreloads(), "link").map(
+    (preloadLink) => preloadLink.props.href,
+  );
+
+  assert.deepEqual(preloadSources, [
+    "/assets/yilan/Ａ車.webp",
+    "/assets/yilan/Ｂ車.webp",
+    "/assets/yilan/計程車.webp",
+    "/assets/yilan/甜甜圈.webp",
+    "/assets/yilan/起司.webp",
+    "/assets/yilan/魚肉.webp",
+    "/assets/yilan/香腸.webp",
+    "/assets/yilan/烤雞.webp",
+  ]);
 });
 
 test("全解鎖時預載九格、鴨子與目前性別的大合照", () => {

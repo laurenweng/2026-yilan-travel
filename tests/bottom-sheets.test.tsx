@@ -213,6 +213,37 @@ test("EventInfoSheet 改用 BottomSheet 外殼並保留活動標題行", () => {
   );
 });
 
+test("車輛與菜單 Bottom Sheet 的圖片在開啟時立即載入", () => {
+  const vehicleSheet = CarAssignmentSheet({
+    event: baseEvent,
+    onClose: () => {},
+    returnFocusTo: null,
+  });
+  const menuSheet = EventInfoSheet({
+    actionType: "menu",
+    event: baseEvent,
+    onClose: () => {},
+    returnFocusTo: null,
+  });
+  const vehicleImages = findElementsByClassName(
+    vehicleSheet.props.children,
+    "car-assignment-icon",
+  );
+  const menuImages = findElementsByClassName(
+    menuSheet.props.children,
+    "menu-artwork-icon",
+  );
+
+  assert.equal(vehicleImages.length, 3);
+  assert.equal(menuImages.length, 5);
+  assert.equal(
+    [...vehicleImages, ...menuImages].every(
+      (imageElement) => imageElement.props.loading === "eager",
+    ),
+    true,
+  );
+});
+
 test("交通資訊 Sheet 顯示行程備註內容", () => {
   const element = EventInfoSheet({
     actionType: "transport",

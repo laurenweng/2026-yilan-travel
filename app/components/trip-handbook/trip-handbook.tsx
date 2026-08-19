@@ -43,6 +43,7 @@ import { BackpackItemSheet } from "./backpack-item-sheet";
 import {
   BackpackArtworkPreloads,
   BackpackView,
+  SheetArtworkPreloads,
 } from "./backpack-view";
 import { BottomNavigation, type NavigationTab } from "./bottom-navigation";
 import { CarAssignmentSheet } from "./car-assignment-sheet";
@@ -276,6 +277,7 @@ export const TripHandbook = () => {
         display={backpackDisplay}
         travelerGender={travelerGender}
       />
+      <SheetArtworkPreloads />
       <div className="trip-app-content">
         {activeTab === "home" && (
           <HomeView
