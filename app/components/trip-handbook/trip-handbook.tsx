@@ -14,14 +14,19 @@ import {
   type BackpackDisplayState,
 } from "../../lib/backpack-state";
 import {
+  readSolvedRewardItemIds,
   readSeenRewardItemIds,
+  writeSolvedRewardItemIds,
   writeSeenRewardItemIds,
 } from "../../lib/backpack-progress";
 import {
+  closeBackpackChallenge,
   closeBackpackItem,
   createBackpackSession,
+  openBackpackChallenge,
   openBackpackItem,
   resolveSessionBackpackDisplay,
+  submitBackpackChallengeAnswer,
 } from "../../lib/backpack-session";
 import {
   getLiveScheduleTestTime,
@@ -39,7 +44,10 @@ import {
   type TravelerGender,
 } from "../../lib/traveler-gender";
 import type { TripDataWarning, TripEvent } from "../../lib/trip-types";
-import { BackpackItemSheet } from "./backpack-item-sheet";
+import {
+  BackpackChallengeSheet,
+  BackpackItemSheet,
+} from "./backpack-item-sheet";
 import {
   BackpackArtworkPreloads,
   BackpackView,
@@ -108,7 +116,10 @@ export const TripHandbook = () => {
     readServerBackpackPreviewState,
   );
   const [backpackSession, setBackpackSession] = useState(() =>
-    createBackpackSession(readSeenRewardItemIds()),
+    createBackpackSession(
+      readSeenRewardItemIds(),
+      readSolvedRewardItemIds(),
+    ),
   );
   const [currentTime, setCurrentTime] = useState(initialTripTime);
   const [selectedItineraryDate, setSelectedItineraryDate] =
@@ -240,6 +251,38 @@ export const TripHandbook = () => {
     [backpackSession, isTripTimePreview],
   );
 
+  const handleOpenBackpackChallenge = useCallback(
+    (item: BackpackDisplayItem, triggerElement: HTMLElement) => {
+      setSheetTrigger(triggerElement);
+      setBackpackSession((session) => openBackpackChallenge(session, item));
+    },
+    [],
+  );
+
+  const handleSubmitBackpackChallengeAnswer = useCallback(
+    (answer: string) => {
+      const result = submitBackpackChallengeAnswer(
+        backpackSession,
+        answer,
+        { isTripTimePreview },
+      );
+      setBackpackSession(result.session);
+
+      if (result.shouldPersist) {
+        writeSeenRewardItemIds(result.session.seenItemIds);
+        writeSolvedRewardItemIds(result.session.solvedItemIds);
+      }
+
+      return result.isCorrect;
+    },
+    [backpackSession, isTripTimePreview],
+  );
+
+  const handleCloseBackpackChallengeSheet = useCallback(
+    () => setBackpackSession(closeBackpackChallenge),
+    [],
+  );
+
   const handleCloseBackpackItemSheet = useCallback(
     () => setBackpackSession(closeBackpackItem),
     [],
@@ -303,6 +346,7 @@ export const TripHandbook = () => {
         {activeTab === "backpack" && (
           <BackpackView
             display={backpackDisplay}
+            onOpenChallenge={handleOpenBackpackChallenge}
             onOpenItem={handleOpenBackpackItem}
           />
         )}
@@ -337,6 +381,15 @@ export const TripHandbook = () => {
           onClose={handleCloseBackpackItemSheet}
           returnFocusTo={sheetTrigger}
           travelerGender={travelerGender}
+        />
+      )}
+
+      {backpackSession.selectedChallengeItem && (
+        <BackpackChallengeSheet
+          item={backpackSession.selectedChallengeItem}
+          onClose={handleCloseBackpackChallengeSheet}
+          onSubmitAnswer={handleSubmitBackpackChallengeAnswer}
+          returnFocusTo={sheetTrigger}
         />
       )}
     </main>

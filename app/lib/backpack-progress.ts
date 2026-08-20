@@ -7,8 +7,32 @@ import {
 import type { BackpackDisplay, BackpackDisplayItem } from "./backpack-state";
 import { getTripEventEndTimestamp } from "./trip-time";
 import type { TripEvent } from "./trip-types";
+import type { TripRewardChallenge } from "./trip-types";
 
 export const SEEN_REWARDS_STORAGE_KEY = "yilan-trip.seen-rewards.v1";
+export const SOLVED_REWARDS_STORAGE_KEY = "yilan-trip.solved-rewards.v1";
+
+const normalizeChallengeAnswer = (value: string) =>
+  value
+    .normalize("NFKC")
+    .trim()
+    .toLocaleLowerCase("zh-TW")
+    .replace(/\s+/g, "")
+    .replace(/[.,，。!！?？、・:：;；'"“”‘’()（）-]/g, "");
+
+export const isBackpackChallengeAnswerCorrect = (
+  answer: string,
+  acceptableAnswers: readonly string[],
+) => {
+  const normalizedAnswer = normalizeChallengeAnswer(answer);
+  return (
+    normalizedAnswer.length > 0 &&
+    acceptableAnswers.some(
+      (acceptableAnswer) =>
+        normalizeChallengeAnswer(acceptableAnswer) === normalizedAnswer,
+    )
+  );
+};
 
 const dialogueByUnlockState = {
   locked: "旅行的途中，記得回來檢查背包唷！",
@@ -17,6 +41,7 @@ const dialogueByUnlockState = {
 };
 
 type RewardEntry = {
+  challenge?: TripRewardChallenge;
   copy: string;
   endTimestamp: number;
 };
@@ -26,18 +51,21 @@ export const resolveBackpackDisplay = (
   events: TripEvent[],
   now: Date,
   seenItemIds: ReadonlySet<BackpackItemId>,
+  solvedItemIds: ReadonlySet<BackpackItemId> = new Set(),
 ): BackpackDisplay => {
   const rewardEntryByItemId = new Map<BackpackItemId, RewardEntry>();
   for (const event of events) {
     const endTimestamp = getTripEventEndTimestamp(event);
     if (event.reward) {
       rewardEntryByItemId.set(event.reward.itemId, {
+        challenge: event.reward.challenge,
         copy: event.reward.copy,
         endTimestamp,
       });
     }
     if (event.reward2) {
       rewardEntryByItemId.set(event.reward2.itemId, {
+        challenge: event.reward2.challenge,
         copy: event.reward2.copy,
         endTimestamp,
       });
@@ -60,14 +88,24 @@ export const resolveBackpackDisplay = (
     }
 
     const catalogItem = backpackCatalogById.get(winningItemId ?? slotItemIds[0])!;
-    const isUnlocked = winningItemId !== null;
+    const rewardEntry = winningItemId
+      ? rewardEntryByItemId.get(winningItemId)
+      : undefined;
+    const isChallengeAvailable = Boolean(
+      winningItemId &&
+        rewardEntry?.challenge &&
+        !solvedItemIds.has(winningItemId),
+    );
+    const isUnlocked = winningItemId !== null && !isChallengeAvailable;
     const isNew = isUnlocked && !seenItemIds.has(catalogItem.id);
 
     return {
       artwork: catalogItem.artwork,
-      copy: winningItemId ? rewardEntryByItemId.get(winningItemId)?.copy : undefined,
+      challenge: isChallengeAvailable ? rewardEntry?.challenge : undefined,
+      copy: winningItemId ? rewardEntry?.copy : undefined,
       detailArtwork: catalogItem.detailArtwork,
       id: catalogItem.id,
+      isChallengeAvailable,
       isNew,
       isUnlocked,
       name: catalogItem.name,
@@ -108,16 +146,31 @@ export const parseSeenRewardItemIds = (
   }
 };
 
+export const parseSolvedRewardItemIds = (
+  rawValue: string | null,
+): Set<BackpackItemId> => parseSeenRewardItemIds(rawValue);
+
 /** 讀取正式模式下的已讀集合；伺服器端渲染時回傳空集合。 */
 export const readSeenRewardItemIds = (): Set<BackpackItemId> => {
   if (typeof window === "undefined") return new Set();
   return parseSeenRewardItemIds(window.localStorage.getItem(SEEN_REWARDS_STORAGE_KEY));
 };
 
+export const readSolvedRewardItemIds = (): Set<BackpackItemId> => {
+  if (typeof window === "undefined") return new Set();
+  return parseSolvedRewardItemIds(
+    window.localStorage.getItem(SOLVED_REWARDS_STORAGE_KEY),
+  );
+};
+
 /** 將已讀集合序列化成 JSON 陣列字串，供寫入 localStorage。 */
 export const serializeSeenRewardItemIds = (
   seenItemIds: ReadonlySet<BackpackItemId>,
 ): string => JSON.stringify([...seenItemIds]);
+
+export const serializeSolvedRewardItemIds = (
+  solvedItemIds: ReadonlySet<BackpackItemId>,
+): string => JSON.stringify([...solvedItemIds]);
 
 /** 寫入正式模式下的已讀集合；無痕模式或配額不足時安靜失敗，不影響畫面。 */
 export const writeSeenRewardItemIds = (
@@ -132,5 +185,20 @@ export const writeSeenRewardItemIds = (
     );
   } catch {
     // 無痕模式或儲存配額不足：忽略，讀取狀態仍以記憶體內的 seenItemIds 為準。
+  }
+};
+
+export const writeSolvedRewardItemIds = (
+  solvedItemIds: ReadonlySet<BackpackItemId>,
+): void => {
+  if (typeof window === "undefined") return;
+
+  try {
+    window.localStorage.setItem(
+      SOLVED_REWARDS_STORAGE_KEY,
+      serializeSolvedRewardItemIds(solvedItemIds),
+    );
+  } catch {
+    // 無痕模式或儲存配額不足：忽略，讀取狀態仍以記憶體內的 solvedItemIds 為準。
   }
 };

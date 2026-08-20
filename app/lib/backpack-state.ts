@@ -5,15 +5,18 @@ import {
   type BackpackDetailArtwork,
   type BackpackItemId,
 } from "./backpack-catalog";
+import type { TripRewardChallenge } from "./trip-types";
 
 export type BackpackDisplayState = "locked" | "unlocked" | "new" | "all";
 
 export type BackpackDisplayItem = {
   artwork: BackpackArtwork;
-  /** 只在已解鎖且找到對應行程時才有值；用來決定物品格是否可點開 Bottom Sheet。 */
+  challenge?: TripRewardChallenge;
+  /** 只在行程已結束且找到對應行程時才有值。 */
   copy?: string;
   detailArtwork?: BackpackDetailArtwork;
   id: BackpackItemId;
+  isChallengeAvailable: boolean;
   isNew: boolean;
   isUnlocked: boolean;
   name: string;
@@ -63,6 +66,7 @@ export const getBackpackDisplay = (
 
       return {
         ...catalogItem,
+        isChallengeAvailable: false,
         isNew: state === "new" && index === 1,
         isUnlocked,
       };

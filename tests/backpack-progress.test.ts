@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import * as backpackProgressModule from "../app/lib/backpack-progress.ts";
 import {
   resolveBackpackDisplay,
   parseSeenRewardItemIds,
@@ -40,6 +41,105 @@ const events: TripEvent[] = [
   makeRewardEvent("d1-lunch", "11:00", "fried-chicken"),
 ];
 
+const isBackpackChallengeAnswerCorrect = (
+  backpackProgressModule as typeof backpackProgressModule & {
+    isBackpackChallengeAnswerCorrect?: (
+      answer: string,
+      acceptableAnswers: readonly string[],
+    ) => boolean;
+  }
+).isBackpackChallengeAnswerCorrect;
+const solvedRewardStorage = backpackProgressModule as typeof backpackProgressModule & {
+  SOLVED_REWARDS_STORAGE_KEY?: string;
+  parseSolvedRewardItemIds?: (rawValue: string | null) => Set<BackpackItemId>;
+  readSolvedRewardItemIds?: () => Set<BackpackItemId>;
+  serializeSolvedRewardItemIds?: (
+    solvedItemIds: ReadonlySet<BackpackItemId>,
+  ) => string;
+  writeSolvedRewardItemIds?: (
+    solvedItemIds: ReadonlySet<BackpackItemId>,
+  ) => void;
+};
+
+test("答案比對忽略前後空白、大小寫與常見標點，但拒絕不同答案", () => {
+  assert.equal(typeof isBackpackChallengeAnswerCorrect, "function");
+  assert.equal(
+    isBackpackChallengeAnswerCorrect?.("  冬山・火車站！ ", [
+      "冬山火車站",
+      "Dongshan Station",
+    ]),
+    true,
+  );
+  assert.equal(
+    isBackpackChallengeAnswerCorrect?.("DONGSHAN STATION", [
+      "冬山火車站",
+      "Dongshan Station",
+    ]),
+    true,
+  );
+  assert.equal(
+    isBackpackChallengeAnswerCorrect?.("羅東車站", ["冬山火車站"]),
+    false,
+  );
+});
+
+test("答對紀錄使用獨立 localStorage 鍵並只保留合法物品 ID", () => {
+  assert.equal(
+    solvedRewardStorage.SOLVED_REWARDS_STORAGE_KEY,
+    "yilan-trip.solved-rewards.v1",
+  );
+  assert.equal(typeof solvedRewardStorage.parseSolvedRewardItemIds, "function");
+  assert.equal(typeof solvedRewardStorage.serializeSolvedRewardItemIds, "function");
+
+  const solvedItemIds = solvedRewardStorage.parseSolvedRewardItemIds?.(
+    JSON.stringify(["potion", "not-a-real-item"]),
+  );
+  assert.deepEqual(solvedItemIds, new Set(["potion"]));
+  assert.deepEqual(
+    solvedRewardStorage.parseSolvedRewardItemIds?.(
+      solvedRewardStorage.serializeSolvedRewardItemIds?.(
+        new Set(["potion", "fried-chicken"]),
+      ) ?? null,
+    ),
+    new Set(["potion", "fried-chicken"]),
+  );
+});
+
+test("正式答對紀錄可寫入並重新讀取瀏覽器 localStorage", () => {
+  assert.equal(typeof solvedRewardStorage.readSolvedRewardItemIds, "function");
+  assert.equal(typeof solvedRewardStorage.writeSolvedRewardItemIds, "function");
+  const storedValues = new Map<string, string>();
+  const originalWindow = globalThis.window;
+  Object.defineProperty(globalThis, "window", {
+    configurable: true,
+    value: {
+      localStorage: {
+        getItem: (key: string) => storedValues.get(key) ?? null,
+        setItem: (key: string, value: string) => storedValues.set(key, value),
+      },
+    },
+  });
+
+  try {
+    solvedRewardStorage.writeSolvedRewardItemIds?.(
+      new Set(["potion", "fried-chicken"]),
+    );
+    assert.deepEqual(
+      solvedRewardStorage.readSolvedRewardItemIds?.(),
+      new Set(["potion", "fried-chicken"]),
+    );
+  } finally {
+    if (originalWindow === undefined) {
+      Reflect.deleteProperty(globalThis, "window");
+    } else {
+      Object.defineProperty(globalThis, "window", {
+        configurable: true,
+        value: originalWindow,
+      });
+    }
+  }
+});
+
 test("每個物品在對應行程結束後解鎖", () => {
   const beforeAnyUnlock = resolveBackpackDisplay(
     events,
@@ -71,6 +171,41 @@ test("每個物品在對應行程結束後解鎖", () => {
 
   assert.equal(potionItem(bothUnlocked)?.isUnlocked, true);
   assert.equal(friedChickenItem(bothUnlocked)?.isUnlocked, true);
+});
+
+test("啟用答題的物品在行程結束後先顯示可作答，答對後才解鎖", () => {
+  const challengeEvent = makeRewardEvent("d1-meet", "10:00", "potion");
+  challengeEvent.reward = {
+    ...challengeEvent.reward!,
+    challenge: {
+      acceptableAnswers: ["冬山車站", "冬山火車站"],
+      question: "集合地點旁的車站名稱是什麼？",
+    },
+  };
+  const afterEvent = new Date("2026-08-29T10:30:00+08:00");
+
+  const unansweredDisplay = resolveBackpackDisplay(
+    [challengeEvent],
+    afterEvent,
+    new Set(),
+    new Set(),
+  );
+  const solvedDisplay = resolveBackpackDisplay(
+    [challengeEvent],
+    afterEvent,
+    new Set(),
+    new Set(["potion"]),
+  );
+  const unansweredItem = unansweredDisplay.items.find(
+    (item) => item.id === "potion",
+  );
+  const solvedItem = solvedDisplay.items.find((item) => item.id === "potion");
+
+  assert.equal(unansweredItem?.isChallengeAvailable, true);
+  assert.equal(unansweredItem?.isUnlocked, false);
+  assert.equal(unansweredItem?.challenge?.question, "集合地點旁的車站名稱是什麼？");
+  assert.equal(solvedItem?.isChallengeAvailable, false);
+  assert.equal(solvedItem?.isUnlocked, true);
 });
 
 test("沒有綁定獎勵的物品格維持鎖定", () => {
@@ -251,7 +386,7 @@ test("序列化已讀集合為 JSON 陣列字串，可被 parseSeenRewardItemIds
   );
 });
 
-test("共同行程取消後眼睛改在冬山自由觀光結束時解鎖", () => {
+test("共同行程取消後眼睛改在冬山自由觀光結束時開放答題", () => {
   const originalCsvText = readFileSync(
     new URL("../public/data/trip-demo.csv", import.meta.url),
     "utf8",
@@ -272,6 +407,12 @@ test("共同行程取消後眼睛改在冬山自由觀光結束時解鎖", () =>
     new Date("2026-08-29T16:30:00+08:00"),
     new Set(),
   );
+  const afterSolved = resolveBackpackDisplay(
+    cancelledEvents,
+    new Date("2026-08-29T16:30:00+08:00"),
+    new Set(),
+    new Set(["eyes"]),
+  );
 
   assert.equal(
     beforeEnd.items.find((item) => item.id === "eyes")?.isUnlocked,
@@ -279,10 +420,18 @@ test("共同行程取消後眼睛改在冬山自由觀光結束時解鎖", () =>
   );
   assert.equal(
     atEnd.items.find((item) => item.id === "eyes")?.isUnlocked,
+    false,
+  );
+  assert.equal(
+    atEnd.items.find((item) => item.id === "eyes")?.isChallengeAvailable,
     true,
   );
   assert.equal(
-    atEnd.items.find((item) => item.id === "eyes")?.copy,
+    afterSolved.items.find((item) => item.id === "eyes")?.isUnlocked,
+    true,
+  );
+  assert.equal(
+    afterSolved.items.find((item) => item.id === "eyes")?.copy,
     "小旅行就是東看看西看看，獲得了宜蘭的眼界",
   );
 });

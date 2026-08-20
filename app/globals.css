@@ -1576,6 +1576,10 @@ button:focus-visible {
   background: var(--color-page);
 }
 
+.backpack-item-challenge {
+  background: var(--color-page);
+}
+
 .backpack-item-locked {
   background: var(--color-locked-slot);
 }
@@ -1803,6 +1807,58 @@ button:focus-visible {
   font-size: 16px;
   line-height: 1.7;
   margin: 0;
+}
+
+.backpack-challenge-form {
+  display: grid;
+  gap: 16px;
+  margin: 0 32px 32px;
+}
+
+.backpack-challenge-question {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.backpack-challenge-label {
+  display: grid;
+  font-size: 16px;
+  gap: 8px;
+}
+
+.backpack-challenge-input {
+  background: var(--color-panel);
+  border: 2px solid var(--color-line);
+  border-radius: 0;
+  color: var(--color-ink);
+  font: inherit;
+  min-height: 48px;
+  padding: 10px 12px;
+  width: 100%;
+}
+
+.backpack-challenge-input:focus {
+  border-color: var(--color-brand-dark);
+  outline: 2px solid var(--color-brand-dark);
+  outline-offset: 1px;
+}
+
+.backpack-challenge-error {
+  color: var(--color-notification);
+  font-size: 14px;
+  margin: -4px 0 0;
+}
+
+.backpack-challenge-submit {
+  background: var(--color-brand-dark);
+  border: 0;
+  color: var(--color-panel);
+  cursor: pointer;
+  font-size: 16px;
+  min-height: 48px;
+  padding: 10px 16px;
 }
 
 .room-assignment-list {

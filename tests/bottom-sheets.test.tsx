@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import { isValidElement, type ReactElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import * as backpackItemSheetModule from "../app/components/trip-handbook/backpack-item-sheet";
 import { BackpackItemSheet } from "../app/components/trip-handbook/backpack-item-sheet";
 import { BottomSheet } from "../app/components/trip-handbook/bottom-sheet";
 import { CarAssignmentSheet } from "../app/components/trip-handbook/car-assignment-sheet";
@@ -71,6 +72,7 @@ const baseBackpackItem: BackpackDisplayItem = {
   artwork: "蘋果.svg",
   copy: "測試物品文案",
   id: "apple",
+  isChallengeAvailable: false,
   isNew: false,
   isUnlocked: true,
   name: "蘋果",
@@ -81,10 +83,22 @@ const groupPhotoBackpackItem = {
   copy: "結束旅程，將所有旅行的回憶都放進心裡",
   detailArtwork: "new-大合照.webp",
   id: "apple",
+  isChallengeAvailable: false,
   isNew: false,
   isUnlocked: true,
   name: "大合照",
 } as BackpackDisplayItem;
+
+const BackpackChallengeSheet = (
+  backpackItemSheetModule as typeof backpackItemSheetModule & {
+    BackpackChallengeSheet?: (props: {
+      item: BackpackDisplayItem;
+      onClose: () => void;
+      onSubmitAnswer: (answer: string) => boolean;
+      returnFocusTo: HTMLElement | null;
+    }) => ReactNode;
+  }
+).BackpackChallengeSheet;
 
 test("BottomSheet 渲染標題、關閉按鈕與對話框外殼屬性", () => {
   const html = renderToStaticMarkup(
@@ -370,6 +384,36 @@ test("BackpackItemSheet 改用 BottomSheet 外殼，且不含活動標題行", (
     ).length,
     1,
   );
+});
+
+test("解鎖問題 Sheet 顯示 Excel 題目、答案欄位與確認按鈕", () => {
+  assert.equal(typeof BackpackChallengeSheet, "function");
+  if (!BackpackChallengeSheet) return;
+
+  const challengeItem: BackpackDisplayItem = {
+    ...baseBackpackItem,
+    challenge: {
+      acceptableAnswers: ["冬山車站"],
+      question: "集合地點旁的車站名稱是什麼？",
+    },
+    isChallengeAvailable: true,
+    isUnlocked: false,
+  };
+  const html = renderToStaticMarkup(
+    <BackpackChallengeSheet
+      item={challengeItem}
+      onClose={() => {}}
+      onSubmitAnswer={() => false}
+      returnFocusTo={null}
+    />,
+  );
+
+  assert.match(html, />解鎖問題<\/h2>/);
+  assert.match(html, /集合地點旁的車站名稱是什麼？/);
+  assert.match(html, /aria-label="輸入答案"/);
+  assert.match(html, /type="text"/);
+  assert.match(html, /type="submit"/);
+  assert.match(html, />確認答案<\/button>/);
 });
 
 test("大合照物品在 Bottom Sheet 使用寬版詳情圖片", () => {

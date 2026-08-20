@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import * as backpackSessionModule from "../app/lib/backpack-session.ts";
 import {
   closeBackpackItem,
   createBackpackSession,
@@ -18,10 +19,38 @@ const makeItem = (
   artwork: "藥水.webp",
   copy: "測試物品文案",
   id,
+  isChallengeAvailable: false,
   isNew: true,
   isUnlocked: true,
   name,
 });
+
+const makeChallengeItem = (): BackpackDisplayItem => ({
+  ...makeItem("potion", "神秘藥水"),
+  challenge: {
+    acceptableAnswers: ["冬山車站", "冬山火車站"],
+    question: "集合地點旁的車站名稱是什麼？",
+  },
+  isChallengeAvailable: true,
+  isNew: false,
+  isUnlocked: false,
+});
+
+const challengeSessionActions = backpackSessionModule as typeof backpackSessionModule & {
+  openBackpackChallenge?: (
+    session: ReturnType<typeof createBackpackSession>,
+    item: BackpackDisplayItem,
+  ) => ReturnType<typeof createBackpackSession>;
+  submitBackpackChallengeAnswer?: (
+    session: ReturnType<typeof createBackpackSession>,
+    answer: string,
+    mode: { isTripTimePreview: boolean },
+  ) => {
+    isCorrect: boolean;
+    session: ReturnType<typeof createBackpackSession>;
+    shouldPersist: boolean;
+  };
+};
 
 const makeRewardEvent = (
   id: string,
@@ -46,12 +75,54 @@ const makeRewardEvent = (
   },
 });
 
-test("新 session 沒有選取物品，兩份已讀集合都是空的", () => {
-  const session = createBackpackSession(new Set(["potion"]));
+test("新 session 保存正式已讀與答對集合，預覽集合及選取內容保持空白", () => {
+  const session = createBackpackSession(
+    new Set(["potion"]),
+    new Set(["fried-chicken"]),
+  );
 
   assert.equal(session.selectedItem, null);
+  assert.equal(session.selectedChallengeItem, null);
   assert.deepEqual([...session.seenItemIds], ["potion"]);
+  assert.deepEqual([...session.solvedItemIds], ["fried-chicken"]);
   assert.deepEqual([...session.previewSeenItemIds], []);
+  assert.deepEqual([...session.previewSolvedItemIds], []);
+});
+
+test("答錯保留問題且不寫入進度，答對後解鎖並直接選取物品詳情", () => {
+  assert.equal(typeof challengeSessionActions.openBackpackChallenge, "function");
+  assert.equal(
+    typeof challengeSessionActions.submitBackpackChallengeAnswer,
+    "function",
+  );
+  const challengeItem = makeChallengeItem();
+  const openedSession = challengeSessionActions.openBackpackChallenge?.(
+    createBackpackSession(),
+    challengeItem,
+  );
+  assert.equal(openedSession?.selectedChallengeItem, challengeItem);
+
+  const wrongResult = challengeSessionActions.submitBackpackChallengeAnswer?.(
+    openedSession!,
+    "羅東車站",
+    { isTripTimePreview: false },
+  );
+  assert.equal(wrongResult?.isCorrect, false);
+  assert.equal(wrongResult?.shouldPersist, false);
+  assert.equal(wrongResult?.session.selectedChallengeItem, challengeItem);
+
+  const correctResult = challengeSessionActions.submitBackpackChallengeAnswer?.(
+    wrongResult!.session,
+    " 冬山・火車站！ ",
+    { isTripTimePreview: false },
+  );
+  assert.equal(correctResult?.isCorrect, true);
+  assert.equal(correctResult?.shouldPersist, true);
+  assert.equal(correctResult?.session.selectedChallengeItem, null);
+  assert.equal(correctResult?.session.selectedItem?.id, "potion");
+  assert.equal(correctResult?.session.selectedItem?.isUnlocked, true);
+  assert.deepEqual(correctResult?.session.solvedItemIds, new Set(["potion"]));
+  assert.deepEqual(correctResult?.session.seenItemIds, new Set(["potion"]));
 });
 
 test("開啟物品後保存的是傳入的物品快照本身，不是事後查表結果", () => {

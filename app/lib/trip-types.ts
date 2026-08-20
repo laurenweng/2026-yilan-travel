@@ -18,9 +18,15 @@ export type TripAction = {
 
 export type TripReward = {
   artwork: BackpackArtwork;
+  challenge?: TripRewardChallenge;
   copy: string;
   itemId: BackpackItemId;
   name: string;
+};
+
+export type TripRewardChallenge = {
+  acceptableAnswers: string[];
+  question: string;
 };
 
 export type RoomAssignment = {

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useState, type FormEvent } from "react";
 import type { BackpackDisplayItem } from "../../lib/backpack-state";
 import {
   getTravelerArtworkName,
@@ -13,6 +14,64 @@ type BackpackItemSheetProps = {
   onClose: () => void;
   returnFocusTo: HTMLElement | null;
   travelerGender?: TravelerGender;
+};
+
+type BackpackChallengeSheetProps = {
+  item: BackpackDisplayItem;
+  onClose: () => void;
+  onSubmitAnswer: (answer: string) => boolean;
+  returnFocusTo: HTMLElement | null;
+};
+
+export const BackpackChallengeSheet = ({
+  item,
+  onClose,
+  onSubmitAnswer,
+  returnFocusTo,
+}: BackpackChallengeSheetProps) => {
+  const [answer, setAnswer] = useState("");
+  const [hasError, setHasError] = useState(false);
+
+  const handleSubmit = (submitEvent: FormEvent<HTMLFormElement>) => {
+    submitEvent.preventDefault();
+    setHasError(!onSubmitAnswer(answer));
+  };
+
+  return (
+    <BottomSheet
+      onClose={onClose}
+      returnFocusTo={returnFocusTo}
+      title="解鎖問題"
+    >
+      <form className="backpack-challenge-form" onSubmit={handleSubmit}>
+        <p className="backpack-challenge-question">
+          {item.challenge?.question}
+        </p>
+        <label className="backpack-challenge-label">
+          <span>輸入答案</span>
+          <input
+            aria-label="輸入答案"
+            autoComplete="off"
+            className="backpack-challenge-input"
+            onChange={(changeEvent) => {
+              setAnswer(changeEvent.currentTarget.value);
+              setHasError(false);
+            }}
+            type="text"
+            value={answer}
+          />
+        </label>
+        {hasError && (
+          <p aria-live="polite" className="backpack-challenge-error">
+            答案不對，再想想看！
+          </p>
+        )}
+        <button className="backpack-challenge-submit" type="submit">
+          確認答案
+        </button>
+      </form>
+    </BottomSheet>
+  );
 };
 
 export const BackpackItemSheet = ({

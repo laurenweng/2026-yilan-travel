@@ -250,6 +250,62 @@ test("讀取第二個獎勵欄位，一個行程可同時綁定兩個物品", ()
   });
 });
 
+test("獎勵預設啟用答題，並讀取題目與多個可接受答案", () => {
+  const csvText = [
+    "ID,日期,開始,結束,行程名稱,解鎖對應,物品文案,解鎖題目,正確答案",
+    "event-1,2026-08-29,11:20,11:40,宜蘭集合,藥水,測試物品文案,集合地點旁的車站名稱是什麼？,冬山車站｜冬山火車站",
+  ].join("\n");
+
+  const result = parseTripCsv(csvText);
+
+  assert.equal(result.warnings.length, 0);
+  assert.deepEqual(result.events[0].reward?.challenge, {
+    acceptableAnswers: ["冬山車站", "冬山火車站"],
+    question: "集合地點旁的車站名稱是什麼？",
+  });
+});
+
+test("啟用答題為 false 時保留原本的時間到即解鎖", () => {
+  const csvText = [
+    "ID,日期,開始,結束,行程名稱,解鎖對應,物品文案,解鎖題目,正確答案,啟用答題",
+    "event-1,2026-08-29,13:00,14:30,雷射對決賽,盾牌,測試物品文案,,,false",
+  ].join("\n");
+
+  const result = parseTripCsv(csvText);
+
+  assert.equal(result.warnings.length, 0);
+  assert.equal(result.events[0].reward?.challenge, undefined);
+});
+
+test("同一行兩個獎勵可分別控制答題，青蛙怪不會關掉雞腿題目", () => {
+  const csvText = [
+    "ID,日期,開始,結束,行程名稱,解鎖對應,物品文案,解鎖題目,正確答案,解鎖對應2,物品文案2,啟用答題2",
+    "event-1,2026-08-29,11:40,13:00,享用中餐,甕缸雞腿,雞腿文案,桌上的招牌料理是什麼？,甕缸雞,宜蘭青蛙怪,青蛙怪文案,false",
+  ].join("\n");
+
+  const result = parseTripCsv(csvText);
+
+  assert.deepEqual(result.events[0].reward?.challenge, {
+    acceptableAnswers: ["甕缸雞"],
+    question: "桌上的招牌料理是什麼？",
+  });
+  assert.equal(result.events[0].reward2?.challenge, undefined);
+});
+
+test("啟用答題但題目或答案不完整時加入警告並回退為直接解鎖", () => {
+  const csvText = [
+    "ID,日期,開始,結束,行程名稱,解鎖對應,物品文案,解鎖題目,正確答案",
+    "event-1,2026-08-29,11:20,11:40,宜蘭集合,藥水,測試物品文案,集合地點旁的車站名稱是什麼？,",
+  ].join("\n");
+
+  const result = parseTripCsv(csvText);
+
+  assert.equal(result.events[0].reward?.challenge, undefined);
+  assert.deepEqual(result.warnings, [
+    { rowNumber: 2, message: "獎勵啟用答題時需要同時填寫解鎖題目與正確答案" },
+  ]);
+});
+
 test("第二個獎勵只填其中一欄時保留行程並加入警告", () => {
   const csvText = [
     csvHeader,
@@ -645,6 +701,43 @@ test("正式 CSV 的享用中餐同時綁定甕缸雞腿與炸彈兩個獎勵", 
   assert.equal(
     eventsById.get("d1-laser")?.energyCopy,
     "戰意沸騰",
+  );
+});
+
+test("正式 CSV 的八個收藏使用答題，青蛙怪與盾牌維持直接解鎖", () => {
+  const csvText = readFileSync(
+    new URL("../public/data/trip-demo.csv", import.meta.url),
+    "utf8",
+  );
+  const result = parseTripCsv(csvText);
+  const rewards = result.events.flatMap((event) =>
+    [event.reward, event.reward2].filter(
+      (reward): reward is NonNullable<typeof reward> => reward !== undefined,
+    ),
+  );
+
+  assert.deepEqual(
+    rewards
+      .filter((reward) => reward.challenge)
+      .map((reward) => reward.itemId),
+    [
+      "potion",
+      "fried-chicken",
+      "eyes",
+      "drink",
+      "heart",
+      "lightning",
+      "star",
+      "apple",
+    ],
+  );
+  assert.equal(
+    rewards.find((reward) => reward.itemId === "bomb")?.challenge,
+    undefined,
+  );
+  assert.equal(
+    rewards.find((reward) => reward.itemId === "shield")?.challenge,
+    undefined,
   );
 });
 

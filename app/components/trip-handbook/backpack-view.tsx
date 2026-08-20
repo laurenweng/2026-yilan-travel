@@ -17,10 +17,14 @@ export const BackpackArtworkPreloads = ({
   display,
   travelerGender,
 }: BackpackArtworkPreloadsProps) => {
-  const artworkSources = display.items.map(
-    (item) =>
-      `/assets/yilan/${item.isUnlocked ? item.artwork : "鎖頭.webp"}`,
-  );
+  const artworkSources = display.items.map((item) => {
+    const artwork = item.isUnlocked
+      ? item.artwork
+      : item.isChallengeAvailable
+        ? "問號.webp"
+        : "鎖頭.webp";
+    return `/assets/yilan/${artwork}`;
+  });
   artworkSources.push("/assets/yilan/鴨子.webp");
 
   display.items.forEach((item) => {
@@ -66,13 +70,21 @@ export const SheetArtworkPreloads = () => {
 
 type BackpackViewProps = {
   display: BackpackDisplay;
+  onOpenChallenge?: (
+    item: BackpackDisplayItem,
+    triggerElement: HTMLElement,
+  ) => void;
   onOpenItem?: (
     item: BackpackDisplayItem,
     triggerElement: HTMLElement,
   ) => void;
 };
 
-export const BackpackView = ({ display, onOpenItem }: BackpackViewProps) => {
+export const BackpackView = ({
+  display,
+  onOpenChallenge,
+  onOpenItem,
+}: BackpackViewProps) => {
   return (
     <section className="backpack-view">
       <header className="backpack-header">
@@ -84,14 +96,21 @@ export const BackpackView = ({ display, onOpenItem }: BackpackViewProps) => {
           {display.items.map((item) => {
             const itemStateClassName = item.isUnlocked
               ? "backpack-item-unlocked"
-              : "backpack-item-locked";
+              : item.isChallengeAvailable
+                ? "backpack-item-challenge"
+                : "backpack-item-locked";
+            const artworkName = item.isUnlocked
+              ? item.artwork
+              : item.isChallengeAvailable
+                ? "問號.webp"
+                : "鎖頭.webp";
             const artwork = (
               <Image
                 alt=""
                 className="backpack-item-artwork"
                 height={93}
                 loading="eager"
-                src={`/assets/yilan/${item.isUnlocked ? item.artwork : "鎖頭.webp"}`}
+                src={`/assets/yilan/${artworkName}`}
                 unoptimized
                 width={93}
               />
@@ -99,12 +118,29 @@ export const BackpackView = ({ display, onOpenItem }: BackpackViewProps) => {
 
             return (
               <li
-                aria-label={item.isUnlocked ? `已解鎖收藏 ${item.name}` : "尚未解鎖"}
+                aria-label={
+                  item.isUnlocked
+                    ? `已解鎖收藏 ${item.name}`
+                    : item.isChallengeAvailable
+                      ? "可回答問題解鎖"
+                      : "尚未解鎖"
+                }
                 className={`backpack-item ${itemStateClassName}${item.isNew ? " backpack-item-new" : ""}`}
                 key={item.id}
               >
                 {item.isNew && <span className="backpack-new-badge">New</span>}
-                {item.copy ? (
+                {item.isChallengeAvailable ? (
+                  <button
+                    aria-label="回答解鎖問題"
+                    className="backpack-item-button backpack-challenge-button"
+                    onClick={(clickEvent) =>
+                      onOpenChallenge?.(item, clickEvent.currentTarget)
+                    }
+                    type="button"
+                  >
+                    {artwork}
+                  </button>
+                ) : item.isUnlocked && item.copy ? (
                   <button
                     aria-label={`打開${item.name}`}
                     className="backpack-item-button"

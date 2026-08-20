@@ -38,9 +38,15 @@ type TripCsvRow = {
   能量文案?: string;
   解鎖對應?: string;
   物品文案?: string;
+  解鎖題目?: string;
+  正確答案?: string;
+  啟用答題?: string;
   文案?: string;
   解鎖對應2?: string;
   物品文案2?: string;
+  解鎖題目2?: string;
+  正確答案2?: string;
+  啟用答題2?: string;
   對話文案?: string;
   對話角色?: string;
   行前對話文案?: string;
@@ -70,6 +76,12 @@ const splitList = (value?: string) =>
   normalizeText(value)
     .split(/[、\n]/)
     .map((item) => item.trim())
+    .filter(Boolean);
+
+const splitChallengeAnswers = (value?: string) =>
+  normalizeText(value)
+    .split("｜")
+    .map((answer) => answer.trim())
     .filter(Boolean);
 
 const parseRoomAssignments = (value?: string): RoomAssignment[] =>
@@ -210,6 +222,9 @@ const parseDialogueCharacter = (
 const createRewardFromValues = (
   artworkValue: string,
   copy: string,
+  challengeQuestionValue: string,
+  challengeAnswerValue: string,
+  challengeEnabledValue: string,
   warnings: TripDataWarning[],
   rowNumber: number,
   label: string,
@@ -227,11 +242,30 @@ const createRewardFromValues = (
     return undefined;
   }
 
-  return {
+  const reward = {
     artwork: backpackItem.artwork,
     copy,
     itemId: backpackItem.id,
     name: backpackItem.name,
+  };
+
+  if (challengeEnabledValue.toLocaleLowerCase() === "false") return reward;
+
+  const question = normalizeText(challengeQuestionValue);
+  const acceptableAnswers = splitChallengeAnswers(challengeAnswerValue);
+  if (!question && acceptableAnswers.length === 0) return reward;
+
+  if (!question || acceptableAnswers.length === 0) {
+    warnings.push({
+      rowNumber,
+      message: `${label}啟用答題時需要同時填寫解鎖題目與正確答案`,
+    });
+    return reward;
+  }
+
+  return {
+    ...reward,
+    challenge: { acceptableAnswers, question },
   };
 };
 
@@ -243,6 +277,9 @@ const createReward = (
   createRewardFromValues(
     normalizeText(row.解鎖對應),
     readFirstText(row.物品文案, row.文案),
+    normalizeText(row.解鎖題目),
+    normalizeText(row.正確答案),
+    normalizeText(row.啟用答題),
     warnings,
     rowNumber,
     "獎勵",
@@ -256,6 +293,9 @@ const createReward2 = (
   createRewardFromValues(
     normalizeText(row.解鎖對應2),
     normalizeText(row.物品文案2),
+    normalizeText(row.解鎖題目2),
+    normalizeText(row.正確答案2),
+    normalizeText(row.啟用答題2),
     warnings,
     rowNumber,
     "獎勵2",

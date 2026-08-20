@@ -140,6 +140,53 @@ test("未解鎖背包只預載一張鎖頭與鴨子，不重複九次", () => {
   );
 });
 
+test("行程結束但尚未答對的格子顯示可點擊問號並預載問號圖片", () => {
+  const lockedDisplay = getBackpackDisplay("locked");
+  const challengeDisplay = {
+    ...lockedDisplay,
+    items: lockedDisplay.items.map((item, index) =>
+      index === 0
+        ? {
+            ...item,
+            challenge: {
+              acceptableAnswers: ["冬山車站"],
+              question: "集合地點旁的車站名稱是什麼？",
+            },
+            copy: "測試物品文案",
+            isChallengeAvailable: true,
+          }
+        : item,
+    ),
+  };
+  const view = BackpackView({
+    display: challengeDisplay,
+    onOpenChallenge: () => {},
+  });
+  const challengeButtons = findElementsByClassName(
+    view,
+    "backpack-challenge-button",
+  );
+  const artworkSources = findElementsByClassName(view, "backpack-item-artwork")
+    .map((artwork) => artwork.props.src.split("/").at(-1));
+  const preloads = BackpackArtworkPreloads?.({
+    display: challengeDisplay,
+    travelerGender: "male",
+  });
+  const preloadSources = findElementsByType(preloads, "link").map(
+    (preloadLink) => preloadLink.props.href,
+  );
+
+  assert.equal(challengeButtons.length, 1);
+  assert.equal(challengeButtons[0].type, "button");
+  assert.equal(challengeButtons[0].props["aria-label"], "回答解鎖問題");
+  assert.equal(artworkSources[0], "問號.webp");
+  assert.deepEqual(preloadSources, [
+    "/assets/yilan/問號.webp",
+    "/assets/yilan/鎖頭.webp",
+    "/assets/yilan/鴨子.webp",
+  ]);
+});
+
 test("進站時預載車輛與菜單 Bottom Sheet 的固定圖片", () => {
   assert.ok(SheetArtworkPreloads);
   const preloadSources = findElementsByType(SheetArtworkPreloads(), "link").map(
