@@ -2,8 +2,10 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { isValidElement, type ReactElement, type ReactNode } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { CharacterDialogue } from "../app/components/trip-handbook/character-dialogue";
 import { HomeView } from "../app/components/trip-handbook/home-view";
+import { PretripChecklist } from "../app/components/trip-handbook/pretrip-checklist";
 import { parseTripCsv } from "../app/lib/trip-csv";
 import { resolveTripSnapshot } from "../app/lib/trip-time";
 import type { TripEvent, TripSnapshot } from "../app/lib/trip-types";
@@ -140,6 +142,13 @@ const collectText = (node: ReactNode): string => {
 
   return collectText(node.props.children);
 };
+
+test("行前 Checklist 的新增欄位使用指定提示與按鈕文案", () => {
+  const html = renderToStaticMarkup(<PretripChecklist />);
+
+  assert.match(html, /placeholder="請填寫待辦項目"/);
+  assert.match(html, />加入<\/button>/);
+});
 
 test("丸鴨對話輸出可供定位的角色 class", () => {
   const dialogue = CharacterDialogue({

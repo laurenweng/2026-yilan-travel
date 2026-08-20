@@ -93,12 +93,12 @@ export const PretripChecklist = () => {
         <textarea
           aria-label="新增行前物品"
           onChange={(changeEvent) => setDraftItem(changeEvent.target.value)}
-          placeholder="請輸入項目"
+          placeholder="請填寫待辦項目"
           rows={2}
           value={draftItem}
         />
         <button disabled={!draftItem.trim()} type="submit">
-          送出
+          加入
         </button>
       </form>
     </PixelFrame>
