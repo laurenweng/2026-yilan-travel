@@ -30,6 +30,25 @@ const defaultPretripChecklistItems: PretripChecklistItem[] = [
 export const createInitialPretripChecklist = () =>
   defaultPretripChecklistItems.map((item) => ({ ...item }));
 
+const sortIncompleteItemsFirst = (items: PretripChecklistItem[]) => [
+  ...items.filter((item) => !item.isCompleted),
+  ...items.filter((item) => item.isCompleted),
+];
+
+const insertAtEndOfIncompleteItems = (
+  items: PretripChecklistItem[],
+  incompleteItem: PretripChecklistItem,
+) => {
+  const firstCompletedItemIndex = items.findIndex((item) => item.isCompleted);
+  if (firstCompletedItemIndex === -1) return [...items, incompleteItem];
+
+  return [
+    ...items.slice(0, firstCompletedItemIndex),
+    incompleteItem,
+    ...items.slice(firstCompletedItemIndex),
+  ];
+};
+
 export const addPretripChecklistItem = (
   items: PretripChecklistItem[],
   label: string,
@@ -38,25 +57,32 @@ export const addPretripChecklistItem = (
   const trimmedLabel = label.trim();
   if (!trimmedLabel) return items;
 
-  return [
-    ...items,
-    {
-      id,
-      isCompleted: false,
-      label: trimmedLabel,
-    },
-  ];
+  const newItem = {
+    id,
+    isCompleted: false,
+    label: trimmedLabel,
+  };
+  return insertAtEndOfIncompleteItems(items, newItem);
 };
 
 export const togglePretripChecklistItem = (
   items: PretripChecklistItem[],
   targetId: string,
-) =>
-  items.map((item) =>
-    item.id === targetId
-      ? { ...item, isCompleted: !item.isCompleted }
-      : item,
-  );
+) => {
+  const targetItem = items.find((item) => item.id === targetId);
+  if (!targetItem) return items;
+
+  const toggledItem = {
+    ...targetItem,
+    isCompleted: !targetItem.isCompleted,
+  };
+  const remainingItems = items.filter((item) => item.id !== targetId);
+  if (!targetItem.isCompleted) {
+    return [...remainingItems, toggledItem];
+  }
+
+  return insertAtEndOfIncompleteItems(remainingItems, toggledItem);
+};
 
 const isPretripChecklistItem = (
   candidate: unknown,
@@ -81,11 +107,12 @@ export const parsePretripChecklistStorage = (storedValue: string | null) => {
       return createInitialPretripChecklist();
     }
 
-    return parsedValue.map((item) =>
+    const normalizedItems = parsedValue.map((item) =>
       item.id === "default-toiletries" && item.label === legacyDefaultToiletriesLabel
         ? { ...item, label: defaultToiletriesLabel }
         : item,
     );
+    return sortIncompleteItemsFirst(normalizedItems);
   } catch {
     return createInitialPretripChecklist();
   }

@@ -47,6 +47,29 @@ test("送出非空白文字會新增一個未完成項目", () => {
   );
 });
 
+test("新增項目會排在未完成區最後，不會落到已完成項目後方", () => {
+  const addPretripChecklistItem = getChecklistFunction<
+    (items: ChecklistItem[], label: string, id: string) => ChecklistItem[]
+  >("addPretripChecklistItem");
+  const originalItems = [
+    { id: "unfinished", isCompleted: false, label: "未完成項目" },
+    { id: "completed", isCompleted: true, label: "已完成項目" },
+  ];
+
+  assert.deepEqual(
+    addPretripChecklistItem(originalItems, "行動電源", "custom-power-bank"),
+    [
+      { id: "unfinished", isCompleted: false, label: "未完成項目" },
+      {
+        id: "custom-power-bank",
+        isCompleted: false,
+        label: "行動電源",
+      },
+      { id: "completed", isCompleted: true, label: "已完成項目" },
+    ],
+  );
+});
+
 test("空白文字不會新增項目", () => {
   const addPretripChecklistItem = getChecklistFunction<
     (items: ChecklistItem[], label: string, id: string) => ChecklistItem[]
@@ -61,18 +84,37 @@ test("空白文字不會新增項目", () => {
   );
 });
 
-test("勾選項目只會切換指定項目的完成狀態", () => {
+test("勾選項目會切換完成狀態並移到清單最後", () => {
   const togglePretripChecklistItem = getChecklistFunction<
     (items: ChecklistItem[], id: string) => ChecklistItem[]
   >("togglePretripChecklistItem");
   const originalItems = [
     { id: "first", isCompleted: false, label: "第一項" },
     { id: "second", isCompleted: false, label: "第二項" },
+    { id: "third", isCompleted: false, label: "第三項" },
   ];
 
   assert.deepEqual(togglePretripChecklistItem(originalItems, "second"), [
     { id: "first", isCompleted: false, label: "第一項" },
+    { id: "third", isCompleted: false, label: "第三項" },
     { id: "second", isCompleted: true, label: "第二項" },
+  ]);
+});
+
+test("取消勾選會把項目移到未完成區最後", () => {
+  const togglePretripChecklistItem = getChecklistFunction<
+    (items: ChecklistItem[], id: string) => ChecklistItem[]
+  >("togglePretripChecklistItem");
+  const originalItems = [
+    { id: "first", isCompleted: false, label: "第一項" },
+    { id: "completed", isCompleted: true, label: "較早完成" },
+    { id: "target", isCompleted: true, label: "取消完成" },
+  ];
+
+  assert.deepEqual(togglePretripChecklistItem(originalItems, "target"), [
+    { id: "first", isCompleted: false, label: "第一項" },
+    { id: "target", isCompleted: false, label: "取消完成" },
+    { id: "completed", isCompleted: true, label: "較早完成" },
   ]);
 });
 
@@ -100,6 +142,27 @@ test("儲存內容可重新載入，損壞內容則回到預設清單", () => {
   );
 });
 
+test("載入舊儲存內容時會把已完成項目移到未完成項目之後", () => {
+  const parsePretripChecklistStorage = getChecklistFunction<
+    (storedValue: string | null) => ChecklistItem[]
+  >("parsePretripChecklistStorage");
+
+  assert.deepEqual(
+    parsePretripChecklistStorage(
+      JSON.stringify([
+        { id: "first", isCompleted: false, label: "第一項" },
+        { id: "completed", isCompleted: true, label: "已完成項目" },
+        { id: "second", isCompleted: false, label: "第二項" },
+      ]),
+    ),
+    [
+      { id: "first", isCompleted: false, label: "第一項" },
+      { id: "second", isCompleted: false, label: "第二項" },
+      { id: "completed", isCompleted: true, label: "已完成項目" },
+    ],
+  );
+});
+
 test("既有儲存的盥洗用品預設項目保留勾選狀態並更新文案", () => {
   const parsePretripChecklistStorage = getChecklistFunction<
     (storedValue: string | null) => ChecklistItem[]
@@ -115,12 +178,12 @@ test("既有儲存的盥洗用品預設項目保留勾選狀態並更新文案",
     ),
     [
       { id: "default-tableware", isCompleted: false, label: "帶環保餐具" },
+      { id: "default-clothes", isCompleted: false, label: "換洗衣物" },
       {
         id: "default-toiletries",
         isCompleted: true,
         label: "攜帶盥洗用品（牙刷牙膏）",
       },
-      { id: "default-clothes", isCompleted: false, label: "換洗衣物" },
     ],
   );
 });
